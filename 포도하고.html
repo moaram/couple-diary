@@ -3,55 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Couple Diary (Firebase)</title>
+  <title>Couple Diary Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Noto Serif KR', serif; scroll-behavior: smooth; }
+  </style>
 </head>
-
 <body class="bg-white text-black flex flex-col items-center px-5 py-10">
-  <!-- Header -->
-  <header class="text-center mb-8">
-    <div class="text-4xl mb-2">🖤</div>
-    <h1 class="text-3xl font-bold mb-2">포도야 사랑해</h1>
-    <p class="text-gray-600">김솔음&최요원 💕</p>
-  </header>
 
-  <!-- 로그인 -->
-  <section id="login-section" class="w-full max-w-sm text-center">
-    <h2 class="text-xl font-semibold mb-3">🔐 로그인</h2>
-    <input id="login-id" type="text" placeholder="아이디 (예: SM0710)" class="border w-full px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-gray-400" />
-    <button id="login-btn" class="mt-3 bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800">로그인</button>
-    <p id="login-error" class="text-red-500 text-sm mt-2 hidden">❌ 잘못된 아이디입니다.</p>
-  </section>
+  <!-- 로그인 화면 -->
+  <div id="login-screen" class="w-full max-w-xs text-center">
+    <h1 class="text-3xl font-bold mb-5">🖤 Couple Diary Login</h1>
+    <input id="login-id" type="text" placeholder="아이디 입력 (SM0710 / CY0710)"
+      class="border w-full px-3 py-2 rounded mb-3 focus:outline-none focus:ring-1 focus:ring-gray-400" />
+    <button id="login-btn" class="w-full bg-black text-white py-2 rounded hover:bg-gray-800">로그인</button>
+    <p class="text-gray-500 text-sm mt-3">© 2025 Couple Diary</p>
+  </div>
 
-  <!-- 메인 -->
-  <main id="main-content" class="hidden w-full max-w-3xl space-y-10">
-    <div class="flex justify-between items-center">
-      <p id="welcome-text" class="text-gray-600 text-sm"></p>
-      <button id="logout-btn" class="text-sm border px-3 py-1 rounded hover:bg-gray-100 text-red-500">🚪 로그아웃</button>
-    </div>
+  <!-- 메인 화면 -->
+  <div id="main-screen" class="hidden w-full max-w-3xl space-y-10">
 
-    <!-- 투데이 -->
+    <!-- Header -->
+    <header class="text-center mb-10">
+      <div id="user-heart" class="text-4xl mb-2">🖤</div>
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Couple Diary Dashboard</h1>
+      <p class="text-gray-600">감성적이고 모던한 커플 대시보드</p>
+      <button id="logout-btn" class="mt-3 text-sm text-gray-500 hover:underline">로그아웃</button>
+    </header>
+
+    <!-- Today’s Page -->
     <section class="border-t border-gray-300 pt-6">
       <h2 class="text-2xl font-semibold mb-2">📅 Today’s Page</h2>
-      <input id="today-date" type="date" class="border px-3 py-2 w-full rounded focus:outline-none focus:ring-1 focus:ring-gray-400" />
-      <textarea id="today-text" placeholder="오늘 하루를 적어주세요..." class="mt-3 w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 h-32"></textarea>
-      <button id="save-today" class="mt-3 bg-black text-white px-4 py-2 rounded hover:bg-gray-800">저장</button>
-      <div id="today-records" class="mt-5"></div>
+      <p class="text-gray-700 mb-4">오늘 하루를 간단히 기록해요.</p>
+      <input type="date" id="today-date" class="border px-3 py-2 w-full rounded focus:outline-none focus:ring-1 focus:ring-gray-400" />
+      <textarea id="today-text" placeholder="오늘 하루를 적어주세요..." class="mt-3 w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"></textarea>
+      <button id="save-today" class="mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800">저장</button>
+
+      <div id="today-list" class="mt-5 bg-gray-50 p-3 rounded text-sm"></div>
     </section>
 
-    <!-- 채팅 -->
-    <section class="border-t border-gray-300 pt-6">
+    <!-- Our Chat Log -->
+    <section id="chat-section" class="border-t border-gray-300 pt-6">
       <h2 class="text-2xl font-semibold mb-2">💬 Our Chat Log</h2>
+      <p class="text-gray-700 mb-4">서로 나눈 대화를 기록해요.</p>
+
       <div id="chat-box" class="bg-gray-100 p-4 rounded text-sm font-mono leading-relaxed h-64 overflow-y-auto flex flex-col-reverse">
-        <p class="text-gray-500 text-center">로딩 중...</p>
+        <p class="text-gray-500 text-center">아직 대화가 없습니다 💬</p>
       </div>
-      <div class="mt-3 flex gap-2">
-        <input id="message-input" type="text" placeholder="메시지를 입력하세요" class="border flex-1 px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-gray-400" />
+
+      <div class="mt-4 flex flex-col sm:flex-row gap-2">
+        <input id="message-input" type="text" placeholder="메시지를 입력하세요"
+          class="border flex-[3] px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-gray-400" />
         <button id="send-btn" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">확인</button>
       </div>
     </section>
 
-    <!-- 기념일 -->
+    <!-- Anniversary -->
     <section class="border-t border-gray-300 pt-6">
       <h2 class="text-2xl font-semibold mb-2">💕 Anniversary</h2>
       <table class="w-full text-left border-collapse">
@@ -61,17 +68,23 @@
         <tbody id="anniversary-table"></tbody>
       </table>
     </section>
-  </main>
 
-  <!-- Firebase Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { 
-      getFirestore, collection, addDoc, setDoc, getDoc, doc,
-      query, orderBy, onSnapshot, deleteDoc, serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    <!-- Quotes -->
+    <section class="border-t border-gray-300 pt-6">
+      <h2 class="text-2xl font-semibold mb-2">✉️ Quotes & Letters</h2>
+      <div class="space-y-3 text-gray-700">
+        <p>🖤 “오늘 너한테 고맙다는 말 꼭 하고 싶었어.”</p>
+        <p>🕯️ “사소한 순간들이 제일 소중해.”</p>
+        <p>🌙 “같이 있는 지금이 제일 좋아.”</p>
+      </div>
+    </section>
+  </div>
 
-    /* 🔥 Firebase 설정 */
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
       authDomain: "couple-diary-42d49.firebaseapp.com",
@@ -81,193 +94,144 @@
       appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
       measurementId: "G-2N8R9H692D"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    /* 사용자 설정 */
-    const users = {
-      "SM0710": { name: "김솔음", heart: "🖤", master: false },
-      "CY0710": { name: "최요원", heart: "💙", master: true },
-    };
+    // --- 로그인 ---
+    const loginScreen = document.getElementById("login-screen");
+    const mainScreen = document.getElementById("main-screen");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const userHeart = document.getElementById("user-heart");
     let currentUser = null;
 
-    /* DOM 요소 */
-    const loginSection = document.getElementById("login-section");
-    const mainContent = document.getElementById("main-content");
-    const loginInput = document.getElementById("login-id");
-    const loginBtn = document.getElementById("login-btn");
-    const loginError = document.getElementById("login-error");
-    const welcomeText = document.getElementById("welcome-text");
-    const logoutBtn = document.getElementById("logout-btn");
-    const sendBtn = document.getElementById("send-btn");
-    const messageInput = document.getElementById("message-input");
-    const chatBox = document.getElementById("chat-box");
-    const todayDate = document.getElementById("today-date");
-    const todayText = document.getElementById("today-text");
-    const saveTodayBtn = document.getElementById("save-today");
-    const todayRecords = document.getElementById("today-records");
-    const tbody = document.getElementById("anniversary-table");
+    loginBtn.addEventListener("click", login);
+    document.getElementById("login-id").addEventListener("keydown", e => {
+      if (e.key === "Enter") login();
+    });
 
-    /* 로그인 */
-    function login(id) {
-      const user = users[id];
-      if (!user) {
-        loginError.classList.remove("hidden");
-        setTimeout(() => loginError.classList.add("hidden"), 2500);
+    function login() {
+      const id = document.getElementById("login-id").value.trim();
+      if (id === "SM0710") {
+        currentUser = { id, name: "김솔음", heart: "🖤" };
+      } else if (id === "CY0710") {
+        currentUser = { id, name: "최요원", heart: "💙", master: true };
+      } else {
+        alert("아이디가 올바르지 않습니다 🤍");
         return;
       }
-      currentUser = user;
-      localStorage.setItem("currentUser", id);
-      loginSection.classList.add("hidden");
-      mainContent.classList.remove("hidden");
-      welcomeText.textContent = `${user.heart} ${user.name}님 안녕하세요`;
+      loginScreen.classList.add("hidden");
+      mainScreen.classList.remove("hidden");
+      userHeart.textContent = currentUser.heart;
       loadChat();
       loadToday();
+      loadAnniversary();
     }
 
-    loginBtn.addEventListener("click", () => login(loginInput.value.trim()));
-    loginInput.addEventListener("keydown", e => { if (e.key === "Enter") login(loginInput.value.trim()); });
-    logoutBtn.addEventListener("click", () => { localStorage.removeItem("currentUser"); location.reload(); });
+    logoutBtn.addEventListener("click", () => location.reload());
 
-    const saved = localStorage.getItem("currentUser");
-    if (saved && users[saved]) {
-      currentUser = users[saved];
-      loginSection.classList.add("hidden");
-      mainContent.classList.remove("hidden");
-      welcomeText.textContent = `${currentUser.heart} ${currentUser.name}님 안녕하세요`;
-      loadChat();
-      loadToday();
-    }
-
-    /* 💬 채팅 */
-    async function sendMessage() {
-      if (!messageInput.value.trim()) return;
-      await addDoc(collection(db, "chats"), {
-        name: currentUser.name,
-        heart: currentUser.heart,
-        message: messageInput.value.trim(),
-        timestamp: serverTimestamp(),
-      });
-      messageInput.value = "";
-    }
+    // --- 대화 기능 ---
+    const sendBtn = document.getElementById("send-btn");
+    const chatBox = document.getElementById("chat-box");
+    const messageInput = document.getElementById("message-input");
 
     sendBtn.addEventListener("click", sendMessage);
     messageInput.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
 
+    function sendMessage() {
+      const msg = messageInput.value.trim();
+      if (!msg || !currentUser) return;
+      db.collection("chats").add({
+        name: currentUser.name,
+        heart: currentUser.heart,
+        message: msg,
+        time: Date.now()
+      });
+      messageInput.value = "";
+    }
+
     function loadChat() {
-      const q = query(collection(db, "chats"), orderBy("timestamp", "desc"));
-      onSnapshot(q, (snapshot) => {
+      db.collection("chats").orderBy("time", "desc").onSnapshot(snapshot => {
         chatBox.innerHTML = "";
-        snapshot.forEach((docSnap) => {
-          const chat = docSnap.data();
-          const p = document.createElement("div");
-          p.className = "my-1 flex justify-between items-center";
-          const msgDiv = document.createElement("div");
-          msgDiv.innerHTML = `${chat.heart} <strong>${chat.name}</strong> : ${chat.message}`;
-          p.appendChild(msgDiv);
-
+        snapshot.forEach(doc => {
+          const c = doc.data();
+          const p = document.createElement("p");
+          p.className = "my-1 flex justify-between";
+          p.innerHTML = `${c.heart} <strong>${c.name}</strong>: ${c.message}`;
           if (currentUser.master) {
-            const delBtn = document.createElement("button");
-            delBtn.textContent = "🗑️";
-            delBtn.className = "text-xs text-red-500 ml-2";
-            delBtn.onclick = async () => {
-              if (confirm("이 메시지를 삭제할까요?")) await deleteDoc(doc(db, "chats", docSnap.id));
-            };
-            p.appendChild(delBtn);
+            const del = document.createElement("button");
+            del.textContent = "❌";
+            del.className = "text-xs ml-2 text-red-400 hover:text-red-600";
+            del.onclick = () => db.collection("chats").doc(doc.id).delete();
+            p.appendChild(del);
           }
-
           chatBox.appendChild(p);
         });
       });
     }
 
-    /* 📅 투데이 */
-    async function saveToday() {
-      const date = todayDate.value;
-      const text = todayText.value.trim();
-      if (!date || !text) return alert("날짜와 내용을 입력해주세요 🤍");
+    // --- 투데이 ---
+    const saveToday = document.getElementById("save-today");
+    saveToday.addEventListener("click", saveTodayNote);
 
-      await setDoc(doc(db, "today", date), {
-        date,
+    async function saveTodayNote() {
+      const date = document.getElementById("today-date").value;
+      const text = document.getElementById("today-text").value.trim();
+      if (!date || !text) return alert("날짜와 내용을 입력해주세요 💕");
+      await db.collection("today").doc(date).set({
+        user: currentUser.name,
         text,
-        writer: currentUser.name,
-        timestamp: serverTimestamp(),
+        time: Date.now()
       });
-      todayDate.value = "";
-      todayText.value = "";
+      document.getElementById("today-text").value = "";
     }
 
-    saveTodayBtn.addEventListener("click", saveToday);
-    todayText.addEventListener("keydown", e => { if (e.ctrlKey && e.key === "Enter") saveToday(); });
-
     function loadToday() {
-      const q = query(collection(db, "today"), orderBy("timestamp", "desc"));
-      onSnapshot(q, (snapshot) => {
-        todayRecords.innerHTML = "";
-        snapshot.forEach((docSnap) => {
-          const rec = docSnap.data();
-          const box = document.createElement("div");
-          box.className = "border p-3 rounded bg-gray-50 my-2";
-          const content = document.createElement("div");
-          content.innerHTML = `
-            <strong>${rec.date}</strong> — <span class="text-sm text-gray-500">${rec.writer}</span>
-            <p class="mt-1 text-sm whitespace-pre-line">${rec.text}</p>
-          `;
-          box.appendChild(content);
-
-          if (currentUser.name === rec.writer) {
-            const editBtn = document.createElement("button");
-            editBtn.textContent = "✏️ 수정";
-            editBtn.className = "text-xs text-blue-500 ml-2";
-            editBtn.onclick = async () => {
-              const newText = prompt("수정할 내용을 입력하세요:", rec.text);
-              if (newText !== null) {
-                await setDoc(doc(db, "today", rec.date), {
-                  ...rec,
-                  text: newText,
-                  timestamp: serverTimestamp()
-                });
-              }
-            };
-            box.appendChild(editBtn);
-          }
-
+      db.collection("today").orderBy("time", "desc").onSnapshot(snapshot => {
+        const list = document.getElementById("today-list");
+        list.innerHTML = "";
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const item = document.createElement("div");
+          item.className = "p-2 border-b text-gray-700 flex justify-between";
+          item.innerHTML = `<div><strong>${d.user}</strong> (${doc.id})<br>${d.text}</div>`;
           if (currentUser.master) {
-            const delBtn = document.createElement("button");
-            delBtn.textContent = "🗑️";
-            delBtn.className = "text-xs text-red-500 ml-2";
-            delBtn.onclick = async () => {
-              if (confirm("이 기록을 삭제할까요?")) await deleteDoc(doc(db, "today", rec.date));
-            };
-            box.appendChild(delBtn);
+            const del = document.createElement("button");
+            del.textContent = "❌";
+            del.className = "text-xs text-red-400 hover:text-red-600";
+            del.onclick = () => db.collection("today").doc(doc.id).delete();
+            item.appendChild(del);
           }
-
-          todayRecords.appendChild(box);
+          list.appendChild(item);
         });
       });
     }
 
-    /* 💕 기념일 */
-    const startDate = new Date("2025-07-10");
-    const now = new Date();
-    const events = [
-      { title: "사귄 날 (1일차)", date: startDate },
-      { title: "100일", date: new Date(startDate.getTime() + 99 * 86400000) },
-      { title: "1주년 (365일차)", date: new Date(startDate.getTime() + 364 * 86400000) },
-    ];
-    function daysUntilLabel(d) {
-      const diff = Math.ceil((d - now) / 86400000);
-      return diff >= 0 ? `${diff}일 남음` : `${Math.abs(diff)}일 지남`;
+    // --- 기념일 ---
+    function loadAnniversary() {
+      const startDate = new Date("2025-07-10");
+      const today = new Date();
+      const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const events = [
+        { title: "사귄 날", date: startDate },
+        { title: "100일", date: new Date(startDate.getTime() + 99 * 24 * 60 * 60 * 1000) },
+        { title: "1주년", date: new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate()) }
+      ];
+      const tbody = document.getElementById("anniversary-table");
+      tbody.innerHTML = "";
+      events.forEach(event => {
+        const diff = Math.ceil((event.date - today) / (1000 * 60 * 60 * 24));
+        const remain = diff >= 0 ? `${diff}일 남음` : `${Math.abs(diff)}일 지남`;
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-gray-200";
+        tr.innerHTML = `
+          <td class="py-2">${event.title}</td>
+          <td>${event.date.getFullYear()}.${String(event.date.getMonth() + 1).padStart(2, "0")}.${String(event.date.getDate()).padStart(2, "0")}</td>
+          <td>${remain}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
-    events.forEach(e => {
-      const tr = document.createElement("tr");
-      tr.className = "border-b border-gray-200";
-      tr.innerHTML = `<td class="py-2">${e.title}</td>
-                      <td>${e.date.getFullYear()}.${String(e.date.getMonth()+1).padStart(2,'0')}.${String(e.date.getDate()).padStart(2,'0')}</td>
-                      <td>${daysUntilLabel(e.date)}</td>`;
-      tbody.appendChild(tr);
-    });
   </script>
 </body>
 </html>
