@@ -255,13 +255,18 @@
 </head>
 
 <body>
-  <!-- 로그인 -->
-  <section id="login-section" class="text-center mt-20 space-y-4">
-    <h1 class="text-3xl font-bold text-gray-800">🖤</h1>
-    <input id="login-id" type="text" placeholder="ID 입력 (SM0710)"
-      class="border px-3 py-2 rounded w-64 focus:outline-none focus:ring-1 focus:ring-gray-400" />
-    <button id="login-btn" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-64">로그인</button>
-  </section>
+ <!-- 로그인 -->
+<section id="login-section" class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
+  <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg px-8 py-10 w-80 text-center">
+    <h1 class="text-4xl mb-6">🖤</h1>
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Login</h2>
+    <input id="login-id" type="text" placeholder="ID 입력 (예: SM0710)"
+      class="border px-3 py-2 rounded w-full mb-3 text-center focus:outline-none focus:ring-1 focus:ring-gray-400" />
+    <button id="login-btn"
+      class="bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800 transition">로그인</button>
+  </div>
+</section>
+
 
   <!-- 대시보드 -->
   <main id="dashboard" class="hidden">
@@ -312,3 +317,4 @@
   </main>
 </body>
 </html>
+
