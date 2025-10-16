@@ -22,13 +22,13 @@
     }
 
     body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #f5f5f5, #dcdcdc);
-  filter: brightness(0.9);
-  z-index: -1;
-  }
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, #f5f5f5, #dcdcdc);
+      filter: brightness(0.9);
+      z-index: -1;
+    }
 
     main {
       background: rgba(255, 255, 255, 0.8);
@@ -83,7 +83,7 @@
       loginSection.classList.add("hidden");
       dashboard.classList.remove("hidden");
       userDisplay.textContent = `${currentUser.heart} ${currentUser.name}`;
-      loadToday();
+      loadTodayLogs();
       loadChat();
     });
 
@@ -94,27 +94,56 @@
       loginInput.value = "";
     });
 
-    // Today’s Page
+    // 📅 Today’s Page (누적 저장)
     const todayText = document.getElementById("today-text");
     const todaySave = document.getElementById("today-save");
+    const todayList = document.getElementById("today-list");
 
-    async function loadToday() {
-      const docRef = doc(db, "today", "entry");
-      const snapshot = await getDoc(docRef);
-      if (snapshot.exists()) todayText.value = snapshot.data().text || "";
+    async function loadTodayLogs() {
+      const q = query(collection(db, "todayLogs"), orderBy("timestamp", "desc"));
+      onSnapshot(q, (snapshot) => {
+        todayList.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const log = docSnap.data();
+          const div = document.createElement("div");
+          div.className = "bg-white/80 rounded-lg px-3 py-2 mb-2 shadow-sm";
+          div.innerHTML = `
+            <p class="text-gray-800"><strong>${log.date}</strong> — ${log.text}</p>
+            <div class="flex justify-between items-center text-sm text-gray-500 mt-1">
+              <span>by ${log.updatedBy}</span>
+              ${currentUser && currentUser.name === "최요원" 
+                ? `<button data-id="${docSnap.id}" class="text-xs text-red-500 hover:text-red-700 delete-today">삭제</button>` 
+                : ""}
+            </div>
+          `;
+          todayList.appendChild(div);
+        });
+
+        // 개별 삭제 (최요원 전용)
+        document.querySelectorAll(".delete-today").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            await deleteDoc(doc(db, "todayLogs", btn.dataset.id));
+          });
+        });
+      });
     }
 
     todaySave.addEventListener("click", async () => {
       if (!currentUser) return;
-      await setDoc(doc(db, "today", "entry"), {
-        text: todayText.value,
+      const text = todayText.value.trim();
+      if (!text) return alert("내용을 입력해주세요 ✏️");
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2,"0")}.${String(now.getDate()).padStart(2,"0")}`;
+      await addDoc(collection(db, "todayLogs"), {
+        date: dateStr,
+        text,
         updatedBy: currentUser.name,
         timestamp: serverTimestamp(),
       });
-      alert("오늘의 기록이 저장되었습니다 🤍");
+      todayText.value = "";
     });
 
-    // Chat
+    // 💬 Chat
     const chatBox = document.getElementById("chat-box");
     const chatInput = document.getElementById("chat-input");
     const sendBtn = document.getElementById("send-btn");
@@ -160,11 +189,10 @@
       if (e.key === "Enter") sendChat();
     });
 
-    // Anniversary
+    // 💕 Anniversary
     const startDate = new Date("2025-07-10");
     const today = new Date();
     const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-
     document.getElementById("day-count").textContent = `${diffDays}일째`;
 
     const ddayList = [
@@ -212,6 +240,7 @@
       <textarea id="today-text" placeholder="오늘 하루를 기록하세요..."
         class="w-full border px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"></textarea>
       <button id="today-save" class="bg-black text-white px-4 py-2 rounded mt-2 hover:bg-gray-800 w-full">저장</button>
+      <div id="today-list" class="mt-4"></div>
     </section>
 
     <!-- Chat -->
@@ -245,5 +274,3 @@
   </main>
 </body>
 </html>
-
-
