@@ -37,6 +37,7 @@
       "CY0710": { name: "최요원", heart: "💙" }
     };
 
+    // 로그인
     window.login = function() {
       const code = document.getElementById("loginCode").value.trim();
       if (users[code]) {
@@ -50,24 +51,27 @@
       }
     };
 
+    // 로그아웃
     window.logout = function() {
       currentUser = null;
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("loginPage").style.display = "flex";
     };
 
+    // 날짜 포맷
     function formatDate(ts) {
       const d = ts.toDate ? ts.toDate() : new Date(ts);
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
     }
 
+    // 전체 데이터 로드
     async function loadAllData() {
       const todayLogs = document.getElementById("todayLogs");
       const chatLogs = document.getElementById("chatLogs");
       const playlistGrid = document.getElementById("playlistGrid");
       const gallery = document.getElementById("photoGallery");
 
-      // 📖 투데이로그
+      // 📖 투데이 로그
       const todayQ = query(collection(db, "todayLogs"), orderBy("timestamp", "asc"));
       onSnapshot(todayQ, snap => {
         todayLogs.innerHTML = "";
@@ -83,8 +87,8 @@
               <p>${d.text}</p>
               ${mine ? `
                 <div class="logActions">
-                  <button onclick="editItem('today', '${docSnap.id}', \`${d.text}\`)">✏️ 수정</button>
-                  <button onclick="deleteItem('today', '${docSnap.id}')">🗑️ 삭제</button>
+                  <button class="editBtn" onclick="editItem('today', '${docSnap.id}', \`${d.text}\`)">✏️ 수정</button>
+                  <button class="deleteBtn" onclick="deleteItem('today', '${docSnap.id}')">🗑️ 삭제</button>
                 </div>` : ""}
             </div>`;
         });
@@ -104,8 +108,8 @@
               <small>${formatDate(d.timestamp)}</small>
               ${mine ? `
                 <div class="chatActions">
-                  <button onclick="editItem('chat', '${docSnap.id}', \`${d.message}\`)">✏️</button>
-                  <button onclick="deleteItem('chat', '${docSnap.id}')">🗑️</button>
+                  <button class="editBtn" onclick="editItem('chat', '${docSnap.id}', \`${d.message}\`)">✏️</button>
+                  <button class="deleteBtn" onclick="deleteItem('chat', '${docSnap.id}')">🗑️</button>
                 </div>` : ""}
             </div>`;
         });
@@ -126,8 +130,8 @@
               </div>
               ${mine ? `
                 <div class="songActions">
-                  <button onclick="editItem('playlist', '${docSnap.id}', '${d.url}')">✏️</button>
-                  <button onclick="deleteItem('playlist', '${docSnap.id}')">🗑️</button>
+                  <button class="editBtn" onclick="editItem('playlist', '${docSnap.id}', '${d.url}')">✏️</button>
+                  <button class="deleteBtn" onclick="deleteItem('playlist', '${docSnap.id}')">🗑️</button>
                 </div>` : ""}
             </div>`;
         });
@@ -144,6 +148,7 @@
       });
     }
 
+    // 📷 사진 업로드
     window.uploadPhoto = async function(e) {
       const file = e.target.files[0];
       if (!file || !currentUser) return;
@@ -157,10 +162,10 @@
       });
     };
 
+    // 📖 투데이 로그 추가 / 수정
     window.addTodayLog = async function() {
       const input = document.getElementById("todayInput");
       if (!input.value.trim()) return;
-
       if (editMode.type === "today") {
         await updateDoc(doc(db, "todayLogs", editMode.id), { text: input.value });
         editMode = { type: null, id: null };
@@ -174,10 +179,10 @@
       input.value = "";
     };
 
+    // 💬 채팅 추가 / 수정
     window.addChat = async function() {
       const input = document.getElementById("chatInput");
       if (!input.value.trim()) return;
-
       if (editMode.type === "chat") {
         await updateDoc(doc(db, "chat", editMode.id), { message: input.value });
         editMode = { type: null, id: null };
@@ -192,10 +197,10 @@
       input.value = "";
     };
 
+    // 🎧 플레이리스트 추가 / 수정
     window.addPlaylist = async function() {
       const input = document.getElementById("playlistInput");
       if (!input.value.trim()) return;
-
       if (editMode.type === "playlist") {
         await updateDoc(doc(db, "playlist", editMode.id), { url: input.value });
         editMode = { type: null, id: null };
@@ -209,6 +214,7 @@
       input.value = "";
     };
 
+    // 수정 / 삭제
     window.editItem = function(type, id, content) {
       editMode = { type, id };
       const inputMap = {
@@ -231,14 +237,13 @@
 
   <style>
     body { margin:0; font-family: "Pretendard", sans-serif; background:#fffaf8; color:#333; }
-
     #loginPage {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       height:100vh; background:linear-gradient(135deg,#fff8f7,#ffe9e6);
     }
-    #loginPage h2 { color:#444; }
+    #loginPage h2 { color:#444; margin-bottom:10px; }
     #loginPage input, #loginPage button {
-      margin-top:12px; padding:12px 25px; border:none; border-radius:25px;
+      margin-top:10px; padding:12px 25px; border:none; border-radius:25px;
     }
     #loginPage input { background:#fff; box-shadow:0 0 5px rgba(0,0,0,0.1); }
     #loginPage button { background:#f9a8a8; color:white; cursor:pointer; font-weight:600; }
@@ -261,6 +266,7 @@
       box-shadow:0 2px 8px rgba(0,0,0,0.08);
       display:flex; flex-direction:column;
     }
+
     #todaySection { flex:1; }
     #photoSection { flex:1; }
     #chatSection { flex:1.4; }
@@ -269,17 +275,18 @@
       margin-top:10px; padding:10px 15px; border:1px solid #f5c6c6;
       border-radius:20px; background:#fffaf9; font-size:14px; resize:none;
     }
-    button { margin-top:8px; border:none; border-radius:25px; padding:8px 16px;
+    button {
+      margin-top:8px; border:none; border-radius:25px; padding:8px 16px;
       background:#fbbebe; color:white; cursor:pointer; font-weight:600;
     }
     button:hover { background:#ffc7c7; }
 
+    .editBtn { background:#ffdcdc; color:#333; }
+    .deleteBtn { background:#ffb8b8; color:white; }
+
     .logCard { background:#fff6f6; border-radius:15px; padding:10px; margin-top:10px; }
     .logTop { display:flex; justify-content:space-between; font-size:13px; }
-    .logActions, .chatActions, .songActions { margin-top:5px; display:flex; gap:5px; }
-    .logActions button, .chatActions button, .songActions button {
-      background:#ffe5e0; color:#333; font-size:12px; padding:3px 6px; border-radius:10px;
-    }
+    .logActions { margin-top:6px; display:flex; gap:5px; }
 
     #chatLogs {
       flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px;
@@ -305,6 +312,7 @@
     }
     .songCard:hover { transform:scale(1.05); background:#ffeaea; }
     .songInner { font-size:20px; color:#f47f7f; }
+    .songActions { margin-top:6px; display:flex; gap:5px; justify-content:center; }
 
     .galleryImg { width:100%; border-radius:10px; margin-top:10px; object-fit:cover; }
 
