@@ -1,3 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Couple Space — Soft Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* 🌫️ Soft Blue Gray Theme */
+    :root {
+      --base: #eef1f4;
+      --card: #e0e5eb;
+      --shadow-dark: #c5ccd3;
+      --shadow-light: #f5f8fb;
+      --accent: #7ea3c5;
+      --button: #a7b9c9;
+      --button-hover: #90a8ba;
+      --text: #2e2e2e;
+      --success: #b6d7b9;
+      --delete: #e6b5b5;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--base);
+      color: var(--text);
+      font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    /* 로그인 */
+    #login-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .login-card {
+      background: var(--card);
+      border-radius: 25px;
+      box-shadow: 9px 9px 18px var(--shadow-dark),
+                  -9px -9px 18px var(--shadow-light);
+      padding: 2.5rem;
+      text-align: center;
+      width: 320px;
+      transition: 0.4s ease;
+    }
+
+    .login-card input {
+      background: #e4e9ee;
+      border: none;
+      border-radius: 14px;
+      padding: 10px;
+      width: 100%;
+      box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                  inset -3px -3px 6px var(--shadow-light);
+      font-size: 0.95rem;
+      outline: none;
+      margin-top: 1rem;
+    }
+
+    .login-card button {
+      margin-top: 1.5rem;
+      background: var(--button);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 10px 0;
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 5px 5px 10px var(--shadow-dark),
+                  -5px -5px 10px var(--shadow-light);
+      transition: 0.3s ease;
+    }
+    .login-card button:hover { background: var(--button-hover); box-shadow: 0 0 10px rgba(126,163,197,0.5); }
+
+    .heart { font-size: 2.2rem; color: var(--accent); animation: heartPop 1s ease-out; }
+    @keyframes heartPop {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    /* 대시보드 */
+    #dashboard { display: none; flex-direction: column; gap: 1rem; padding: 1.5rem; max-width: 1280px; margin: 0 auto; }
+    header { display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; }
+    #userDisplay { font-weight: 600; color: var(--accent); font-size: 1rem; }
+    .logout-btn { background: transparent; border: none; color: var(--text); cursor: pointer; opacity: 0.7; transition: 0.3s; }
+    .logout-btn:hover { opacity: 1; text-shadow: 0 0 6px rgba(126,163,197,0.5); }
+
+    .panel {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 9px 9px 18px var(--shadow-dark),
+                  -9px -9px 18px var(--shadow-light);
+      padding: 1.2rem;
+      flex: 1;
+      animation: fadeIn 0.5s ease;
+    }
+
+    h2 { color: var(--accent); font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+    textarea, input[type="text"] {
+      background: #e4e9ee;
+      border: none;
+      border-radius: 12px;
+      width: 100%;
+      padding: 8px;
+      font-size: 0.9rem;
+      box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                  inset -3px -3px 6px var(--shadow-light);
+      outline: none;
+    }
+
+    button.primary {
+      background: var(--button);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 5px 5px 10px var(--shadow-dark),
+                  -5px -5px 10px var(--shadow-light);
+    }
+    button.primary:hover {
+      background: var(--button-hover);
+      box-shadow: 0 0 10px rgba(126,163,197,0.5);
+    }
+
+    .layout-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .left, .center, .right { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .photo-box img {
+      width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      max-height: 480px;
+      animation: fadeIn 1s ease;
+    }
+
+    /* 🎵 Playlist */
+    .playlist { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .playlist-item {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 6px 6px 12px var(--shadow-dark),
+                  -6px -6px 12px var(--shadow-light);
+      padding: 0.8rem;
+      text-align: center;
+      transition: 0.3s;
+      animation: fadeIn 0.6s ease;
+    }
+    .playlist-item:hover { transform: translateY(-3px); box-shadow: 0 0 10px rgba(126,163,197,0.4); }
+
+    /* 💬 Chat 스타일 */
+    .chat-message {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      box-shadow: 3px 3px 6px var(--shadow-dark),
+                  -3px -3px 6px var(--shadow-light);
+      word-break: break-word;
+      opacity: 0;
+      animation: fadeInUp 0.4s forwards;
+    }
+
+    .chat-me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent), #a8bed4);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-other {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #dee3e9, #f3f6f8);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .edit-btn, .del-btn {
+      background: none;
+      border: none;
+      font-size: 0.8rem;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: 0.2s;
+    }
+    .edit-btn:hover, .del-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+      text-shadow: 0 0 6px rgba(126,163,197,0.4);
+    }
+
+    /* ✨ 알림 */
+    #alertBox {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--card);
+      padding: 12px 20px;
+      border-radius: 12px;
+      box-shadow: 6px 6px 12px var(--shadow-dark),
+                  -6px -6px 12px var(--shadow-light);
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media (max-width: 768px) {
+      .layout-row { flex-direction: column; }
+      .chat-message { max-width: 85%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✨ 알림 -->
+  <div id="alertBox"></div>
+
+  <!-- 로그인 -->
+  <section id="login-section">
+    <div class="login-card">
+      <div class="heart mb-3">💙</div>
+      <h2>Login</h2>
+      <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" />
+      <button id="login-btn">Login</button>
+    </div>
+  </section>
+
+  <!-- 대시보드 -->
+  <main id="dashboard">
+    <header>
+      <span id="userDisplay"></span>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </header>
+
+    <div class="layout-row">
+      <section class="panel left">
+        <h2>🖤 Today Log</h2>
+        <textarea id="today-text" placeholder="오늘 하루를 기록하세요..."></textarea>
+        <button class="primary" id="today-save">저장</button>
+        <div id="today-list" class="mt-2 space-y-2"></div>
+      </section>
+
+      <section class="panel center">
+        <h2>📸 Couple Photo</h2>
+        <input type="file" id="photo-upload" accept="image/*" class="mt-2" />
+        <div class="photo-box mt-2"><img id="photo-display" src="" alt="couple"></div>
+      </section>
+
+      <section class="panel right">
+        <h2>💬 Chat Log</h2>
+        <div id="chat-box" class="overflow-auto flex flex-col gap-2 h-[350px] bg-[#e8edf2] rounded-xl p-2"></div>
+        <input id="chat-input" type="text" placeholder="메시지를 입력하세요" />
+        <button class="primary mt-1" id="send-btn">보내기</button>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h2>🎵 Playlist</h2>
+      <div class="flex gap-2 mt-2">
+        <input id="music-link" placeholder="YouTube 링크 입력" type="text" class="flex-1" />
+        <button id="music-add" class="primary">추가</button>
+      </div>
+      <div id="music-list" class="playlist mt-3"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
+      updateDoc, doc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
+      authDomain: "couple-diary-42d49.firebaseapp.com",
+      projectId: "couple-diary-42d49",
+      storageBucket: "couple-diary-42d49.firebasestorage.app",
+      messagingSenderId: "162533479109",
+      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
     // ⚙️ DOM
     const loginSection = document.getElementById("login-section");
     const dashboard = document.getElementById("dashboard");
