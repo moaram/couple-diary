@@ -16,28 +16,30 @@
     html, body {
       height: 100%;
       margin: 0;
-      overflow-x: hidden;
-    }
-    body {
       background: linear-gradient(135deg, rgba(232,156,184,0.06), rgba(156,199,232,0.04));
       font-family: "Noto Sans KR", system-ui;
       color: #2b2b2b;
-      transition: all 0.5s ease;
     }
 
+    /* 로그인 섹션: 화면 전체 덮기 */
     #login-section {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 50;
+      transition: opacity 0.4s ease;
     }
 
+    /* 하트 애니메이션 */
     .heart-pop {
       animation: heartIn 0.8s ease-out forwards;
     }
     @keyframes heartIn {
-      0% { transform: scale(0); opacity: 0; }
-      70% { transform: scale(1.2); opacity: 1; }
+      0% { transform: scale(0); opacity:0; }
+      70% { transform: scale(1.2); opacity:1; }
       100% { transform: scale(1); }
     }
 
@@ -54,22 +56,43 @@
     .brand h1 { font-size: 1.1rem; color: var(--muted); margin: 0; font-weight: 700; }
 
     .layout-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .panel { background: #fff; border-radius: 14px; padding: 1rem; box-shadow: 0 6px 20px rgba(58,75,99,0.04); border: 1px solid rgba(58,75,99,0.04); }
+    .panel {
+      background: #fff; border-radius: 14px; padding: 1rem;
+      box-shadow: 0 6px 20px rgba(58,75,99,0.04);
+      border: 1px solid rgba(58,75,99,0.04);
+    }
     .left, .right { flex: 1 1 300px; min-width: 260px; display: flex; flex-direction: column; gap: 0.6rem; }
     .center { flex: 0 1 420px; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
 
     .photo-box img { width: 100%; border-radius: 8px; object-fit: cover; max-height: 520px; }
-    @media(max-width:640px){.center{order:2;width:100%}.left{order:1;width:100%}.right{order:3;width:100%}}
+    @media(max-width:640px){ .center{order:2;width:100%}.left{order:1;width:100%}.right{order:3;width:100%} }
 
     h2 { font-size: 0.95rem; margin: 0; color: var(--muted); }
-    input, textarea { border: 1px solid rgba(0,0,0,0.06); border-radius: 10px; padding: 0.6rem; font-size: 0.9rem; }
+    input, textarea {
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 0.6rem;
+      font-size: 0.9rem;
+    }
     textarea { min-height: 84px; resize: vertical; }
-    button.primary { background: var(--accent); color: white; padding: 0.55rem 0.8rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; }
-    button.ghost { background: transparent; border: 1px solid rgba(0,0,0,0.06); padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.88rem; color: var(--muted); }
-    .item { background: #fafafa; border-radius: 8px; padding: 0.6rem; border: 1px solid rgba(0,0,0,0.03); font-size: 0.9rem; }
-    .meta { font-size: 0.78rem; color: #7b7b7b; }
+    button.primary {
+      background: var(--accent); color: white;
+      padding: 0.55rem 0.8rem; border-radius: 10px;
+      font-weight: 600; font-size: 0.95rem;
+    }
+    button.ghost {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 0.45rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .item { background:#fafafa;border-radius:8px;padding:0.6rem;border:1px solid rgba(0,0,0,0.03);font-size:0.9rem; }
+    .meta { font-size:0.78rem;color:#7b7b7b; }
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -111,10 +134,11 @@
 
         <section class="panel center">
           <h2>📸 Couple Photo</h2>
-          <div class="photo-box mt-2 flex flex-col items-center space-y-3">
-            <img id="couple-photo" src="https://placehold.co/400x400?text=Couple+Photo" alt="커플 사진" class="rounded-2xl shadow-md w-full max-w-sm object-cover" />
-            <input type="file" id="photo-upload" accept="image/*" class="hidden text-sm border border-gray-300 rounded-md px-2 py-1 cursor-pointer" />
+          <div class="photo-box mt-2">
+            <img id="photo-img" src="" alt="couple">
           </div>
+          <input type="file" id="photo-upload" accept="image/*" class="mt-2 hidden"/>
+          <button id="photo-btn" class="primary mt-1 hidden">사진 업로드</button>
         </section>
 
         <section class="panel right">
@@ -139,21 +163,18 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import {
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
-      updateDoc, doc, getDoc
+      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, updateDoc, doc, getDoc
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig = {
-      apiKey:"AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
-      authDomain:"couple-diary-42d49.firebaseapp.com",
-      projectId:"couple-diary-42d49",
-      storageBucket:"couple-diary-42d49.firebasestorage.app",
-      messagingSenderId:"162533479109",
-      appId:"1:162533479109:web:a67f8d213bddafc66fd6ac",
-      measurementId:"G-2N8R9H692D"
+      apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
+      authDomain: "couple-diary-42d49.firebaseapp.com",
+      projectId: "couple-diary-42d49",
+      storageBucket: "couple-diary-42d49.firebasestorage.app",
+      messagingSenderId: "162533479109",
+      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
+      measurementId: "G-2N8R9H692D"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -177,9 +198,9 @@
     const musicInput = document.getElementById("music-link");
     const musicList = document.getElementById("music-list");
     const topDay = document.getElementById("top-day");
-
-    const photoInput = document.getElementById("photo-upload");
-    const photoImg = document.getElementById("couple-photo");
+    const photoImg = document.getElementById("photo-img");
+    const photoBtn = document.getElementById("photo-btn");
+    const photoUpload = document.getElementById("photo-upload");
 
     let currentUser = null;
 
@@ -202,15 +223,12 @@
       heartLogo.classList.add("heart-pop");
 
       setTimeout(()=>{
-        loginSection.classList.add("hidden");
+        loginSection.style.display="none";
         dashboard.classList.remove("hidden");
         userDisplayTop.textContent=`${currentUser.heart} ${currentUser.name}`;
         logoutTop.style.display="inline-block";
-        loadToday();
-        loadChat();
-        loadMusic();
-        loadPhoto();
-        enablePhotoUpload();
+        loadToday(); loadChat(); loadMusic(); loadPhoto();
+        if(currentUser.name==="최요원") photoBtn.classList.remove("hidden");
         window.scrollTo({ top: 0 });
       },700);
     }
@@ -218,7 +236,7 @@
     logoutTop.addEventListener("click",()=>{
       currentUser=null;
       dashboard.classList.add("hidden");
-      loginSection.classList.remove("hidden");
+      loginSection.style.display="flex";
       heartLogo.textContent="🤍";
       heartLogo.classList.remove("heart-pop");
       loginInput.value="";
@@ -245,20 +263,15 @@
           el.className="item";
           el.innerHTML=`
             <div class="flex justify-between items-start">
-              <div>
-                <div>${escapeHtml(d.text)}</div>
-                <div class="meta">by ${d.updatedBy||"?"}</div>
-              </div>
+              <div><div>${escapeHtml(d.text)}</div><div class="meta">by ${d.updatedBy||"?"}</div></div>
               ${d.updatedBy===currentUser?.name ? `<button class="ghost edit-today" data-id="${docSnap.id}">수정</button>`:""}
             </div>`;
           todayList.appendChild(el);
         });
         document.querySelectorAll(".edit-today").forEach(btn=>{
           btn.onclick=async()=>{
-            const id=btn.dataset.id;
-            const ref=doc(db,"todayLogs",id);
-            const snap=await getDoc(ref);
-            const prev=snap.data().text;
+            const ref=doc(db,"todayLogs",btn.dataset.id);
+            const prev=(await getDoc(ref)).data().text;
             const val=prompt("수정:",prev);
             if(val!==null) await updateDoc(ref,{text:val,timestamp:serverTimestamp()});
           };
@@ -290,20 +303,15 @@
           el.className="item";
           el.innerHTML=`
             <div class="flex justify-between items-start">
-              <div>
-                <div class="font-semibold">${d.heart} ${d.name}</div>
-                <div>${escapeHtml(d.message)}</div>
-              </div>
+              <div><div class="font-semibold">${d.heart} ${d.name}</div><div>${escapeHtml(d.message)}</div></div>
               ${d.name===currentUser?.name ? `<button class="ghost edit-chat" data-id="${docSnap.id}">수정</button>`:""}
             </div>`;
           chatBox.appendChild(el);
         });
         document.querySelectorAll(".edit-chat").forEach(btn=>{
           btn.onclick=async()=>{
-            const id=btn.dataset.id;
-            const ref=doc(db,"chat",id);
-            const snap=await getDoc(ref);
-            const prev=snap.data().message;
+            const ref=doc(db,"chat",btn.dataset.id);
+            const prev=(await getDoc(ref)).data().message;
             const val=prompt("수정:",prev);
             if(val!==null)await updateDoc(ref,{message:val,timestamp:serverTimestamp()});
           };
@@ -340,10 +348,8 @@
         });
         document.querySelectorAll(".edit-music").forEach(btn=>{
           btn.onclick=async()=>{
-            const id=btn.dataset.id;
-            const ref=doc(db,"playlist",id);
-            const snap=await getDoc(ref);
-            const prev=snap.data().url;
+            const ref=doc(db,"playlist",btn.dataset.id);
+            const prev=(await getDoc(ref)).data().url;
             const val=prompt("링크 수정:",prev);
             if(val!==null)await updateDoc(ref,{url:val,timestamp:serverTimestamp()});
           };
@@ -351,36 +357,34 @@
       });
     }
 
-    // --- Couple Photo ---
-    function enablePhotoUpload() {
-      if (currentUser?.name === "최요원") photoInput.classList.remove("hidden");
-      else photoInput.classList.add("hidden");
-    }
-
-    function loadPhoto() {
-      const qPhoto = query(collection(db,"photo"), orderBy("time","desc"));
-      onSnapshot(qPhoto, snap => {
-        if (!snap.empty) {
-          const latest = snap.docs[0].data();
-          if (latest.url) photoImg.src = latest.url;
+    // --- Photo ---
+    async function loadPhoto(){
+      const q=query(collection(db,"photo"),orderBy("time","desc"));
+      onSnapshot(q,snap=>{
+        if(!snap.empty){
+          const data=snap.docs[0].data();
+          photoImg.src=data.url;
         }
       });
     }
 
-    photoInput.addEventListener("change", async (e) => {
-      if (!currentUser || currentUser.name !== "최요원") return;
-      const file = e.target.files[0];
-      if (!file) return;
-      const fileRef = ref(storage, `couple-photo/${file.name}`);
-      await uploadBytes(fileRef, file);
-      const url = await getDownloadURL(fileRef);
-      await addDoc(collection(db, "photo"), { url, time: serverTimestamp(), uploadedBy: currentUser.name });
-      photoImg.src = url;
+    photoBtn.addEventListener("click",()=>photoUpload.click());
+    photoUpload.addEventListener("change",async(e)=>{
+      const file=e.target.files[0];
+      if(!file)return;
+      const fileRef=ref(storage,`couple-photo/${file.name}`);
+      await uploadBytes(fileRef,file);
+      const url=await getDownloadURL(fileRef);
+      await addDoc(collection(db,"photo"),{url,time:serverTimestamp(),uploadedBy:currentUser.name});
     });
 
-    // utils
-    function escapeHtml(str){return str.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
-    function extractYouTubeId(url){const m=url.match(/(?:v=|be\/)([\w-]+)/);return m?m[1]:url;}
+    function extractYouTubeId(url){
+      const match=url.match(/(?:v=|youtu\.be\/)([^&]+)/);
+      return match?match[1]:"";
+    }
+    function escapeHtml(t){
+      const div=document.createElement("div"); div.innerText=t; return div.innerHTML;
+    }
   </script>
 </body>
 </html>
