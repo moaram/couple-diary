@@ -4,312 +4,320 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Couple Diary</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
-      authDomain: "couple-diary-42d49.firebaseapp.com",
-      projectId: "couple-diary-42d49",
-      storageBucket: "couple-diary-42d49.firebasestorage.app",
-      messagingSenderId: "162533479109",
-      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
-      measurementId: "G-2N8R9H692D"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const loginSection = document.getElementById("loginSection");
-    const dashboard = document.getElementById("dashboard");
-    const userLabel = document.getElementById("userLabel");
-    const photoDisplay = document.getElementById("photoDisplay");
-
-    const todayLogList = document.getElementById("todayLogList");
-    const todayLogInput = document.getElementById("todayLogInput");
-
-    const chatList = document.getElementById("chatList");
-    const chatInput = document.getElementById("chatInput");
-
-    const playlist = document.getElementById("playlist");
-    const playlistInput = document.getElementById("playlistInput");
-
-    let currentUser = null;
-
-    // 로그인
-    window.login = () => {
-      const id = document.getElementById("userId").value.trim();
-      if (!id) return alert("아이디를 입력하세요.");
-      currentUser = id;
-      userLabel.innerHTML = `${id === "SM0710" ? "김솔음 🖤" : "최요원 💙"}`;
-      loginSection.classList.add("fade-out");
-      setTimeout(() => {
-        loginSection.style.display = "none";
-        dashboard.style.display = "flex";
-        dashboard.classList.add("fade-in");
-      }, 500);
-      loadAllData();
-    };
-
-    // 로그아웃
-    window.logout = () => {
-      currentUser = null;
-      dashboard.style.display = "none";
-      loginSection.style.display = "flex";
-      document.getElementById("userId").value = "";
-    };
-
-    // 실시간 데이터 로드
-    function loadAllData() {
-      // todayLogs
-      onSnapshot(query(collection(db, "todayLogs"), orderBy("timestamp", "asc")), (snapshot) => {
-        todayLogList.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const d = doc.data();
-          const div = document.createElement("div");
-          div.className = "logCard";
-          div.innerHTML = `<p>${d.text}</p><span>${d.user} · ${formatTime(d.timestamp)}</span>`;
-          todayLogList.appendChild(div);
-        });
-      });
-
-      // chat
-      onSnapshot(query(collection(db, "chat"), orderBy("timestamp", "asc")), (snapshot) => {
-        chatList.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const d = doc.data();
-          const div = document.createElement("div");
-          div.className = `chatCard ${d.user === "SM0710" ? "left" : "right"}`;
-          div.innerHTML = `<p>${d.text}</p><span>${formatTime(d.timestamp)}</span>`;
-          chatList.appendChild(div);
-        });
-      });
-
-      // playlist
-      onSnapshot(query(collection(db, "playlist"), orderBy("timestamp", "asc")), (snapshot) => {
-        playlist.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const d = doc.data();
-          const card = document.createElement("div");
-          card.className = "songCard";
-          card.innerHTML = `<iframe width="100%" height="100" src="${d.link.replace("watch?v=", "embed/")}" frameborder="0" allowfullscreen></iframe>`;
-          playlist.appendChild(card);
-        });
-      });
-
-      // photo
-      onSnapshot(query(collection(db, "photo"), orderBy("timestamp", "desc")), (snapshot) => {
-        if (!snapshot.empty) {
-          const latest = snapshot.docs[0].data();
-          photoDisplay.src = latest.url;
-        }
-      });
-    }
-
-    // 데이터 추가
-    window.addTodayLog = async () => {
-      if (!todayLogInput.value.trim()) return;
-      await addDoc(collection(db, "todayLogs"), {
-        text: todayLogInput.value,
-        user: currentUser,
-        timestamp: serverTimestamp()
-      });
-      todayLogInput.value = "";
-    };
-
-    window.addChat = async () => {
-      if (!chatInput.value.trim()) return;
-      await addDoc(collection(db, "chat"), {
-        text: chatInput.value,
-        user: currentUser,
-        timestamp: serverTimestamp()
-      });
-      chatInput.value = "";
-    };
-
-    window.addPlaylist = async () => {
-      if (!playlistInput.value.trim()) return;
-      await addDoc(collection(db, "playlist"), {
-        link: playlistInput.value,
-        user: currentUser,
-        timestamp: serverTimestamp()
-      });
-      playlistInput.value = "";
-    };
-
-    // 사진 업로드
-    window.uploadPhoto = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        await addDoc(collection(db, "photo"), {
-          url: event.target.result,
-          user: currentUser,
-          timestamp: serverTimestamp()
-        });
-      };
-      reader.readAsDataURL(file);
-    };
-
-    function formatTime(ts) {
-      if (!ts) return "";
-      const d = ts.toDate();
-      return `${d.getFullYear().toString().slice(2)}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} ${d.getHours()}시${String(d.getMinutes()).padStart(2, "0")}분`;
-    }
-  </script>
-
   <style>
+    /* 🌸 기본 테마 */
     body {
-      margin: 0;
       font-family: "Pretendard", sans-serif;
-      background: #fff;
+      background: #fffaf8;
+      margin: 0;
       overflow: hidden;
-      color: #222;
+      color: #2e2e2e;
     }
 
-    /* 페이드 */
-    .fade-in { animation: fadeIn 0.8s ease forwards; }
-    .fade-out { animation: fadeOut 0.5s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-
-    /* 로그인 */
+    /* 로그인 섹션 */
     #loginSection {
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-    }
-    #userId {
-      padding: 10px 20px;
-      font-size: 1rem;
-      border: 2px solid #ffb6a8;
-      border-radius: 10px;
-      outline: none;
-    }
-    button {
-      margin-top: 10px;
-      background: #ffb6a8;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
+      background: #fff;
+      animation: fadeIn 1s ease forwards;
     }
 
-    /* 대시보드 */
-    #dashboard {
-      display: none;
-      height: 100vh;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      gap: 20px;
-    }
-
-    #leftPanel, #rightPanel {
-      width: 25%;
-      height: 80%;
-      background: #f7f7f7;
-      border-radius: 20px;
-      padding: 15px;
-      overflow-y: auto;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    #centerPanel {
+    .loginBox {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 40%;
-      gap: 10px;
+      background: #ffffff;
+      padding: 40px 50px;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(255, 150, 130, 0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    #photoDisplay {
+    .loginBox:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(255, 150, 130, 0.35);
+    }
+
+    .loginBox h1 {
+      color: #ff8e80;
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    #userId {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 2px solid #ffb6a8;
+      font-size: 1rem;
+      outline: none;
+      width: 230px;
+      text-align: center;
+    }
+
+    #userId:focus {
+      border-color: #ff8e80;
+      box-shadow: 0 0 8px rgba(255, 150, 130, 0.4);
+    }
+
+    button {
+      background: #ff8e80;
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    button:hover {
+      background: #ff7366;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* 🌿 대시보드 */
+    #dashboard {
+      display: none;
+      height: 100vh;
+      overflow: hidden;
+      background: #fffaf8;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .topBar {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-weight: 600;
+      color: #444;
+      font-size: 1.1rem;
+      opacity: 0;
+      animation: fadeIn 1.2s ease forwards 1s;
+    }
+
+    .dashboardLayout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      height: 100%;
+      gap: 20px;
+      padding: 80px 50px 50px 50px;
+      align-items: center;
+    }
+
+    .userSection {
+      background: #ffffffb7;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+      height: 90%;
+      overflow-y: auto;
+    }
+
+    .userSection h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #ff8e80;
+    }
+
+    /* 커플사진 */
+    .photoBox {
+      text-align: center;
+    }
+
+    .photoBox img {
       width: 100%;
+      max-width: 350px;
       border-radius: 20px;
       object-fit: cover;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
     }
 
-    input {
+    .photoBox img:hover {
+      transform: scale(1.03);
+    }
+
+    /* 로그 구역 */
+    textarea {
       width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      margin-top: 10px;
-    }
-
-    .logCard, .chatCard {
-      background: #fff;
+      height: 150px;
       border-radius: 12px;
+      border: 1.5px solid #ffb6a8;
       padding: 10px;
-      margin-bottom: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      resize: none;
+      outline: none;
+      font-size: 0.95rem;
+      background: #fffefc;
     }
 
-    .chatCard.left { align-self: flex-start; background: #fef0ee; }
-    .chatCard.right { align-self: flex-end; background: #e0f0ff; }
+    .log {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      background: #fff8f5;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
 
-    #playlist {
+    /* 플레이리스트 */
+    .playlist {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 10px;
-      width: 100%;
       margin-top: 10px;
     }
 
     .songCard {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      padding: 5px;
+      background: #fffefc;
+      border-radius: 15px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
     }
 
-    #topBar {
+    .songCard:hover {
+      transform: translateY(-3px);
+    }
+
+    .logoutBtn {
       position: absolute;
-      top: 10px;
-      right: 20px;
+      top: 20px;
+      left: 30px;
+      background: transparent;
+      border: 2px solid #ff8e80;
+      color: #ff8e80;
+      padding: 6px 14px;
+      border-radius: 10px;
+      cursor: pointer;
       font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .logoutBtn:hover {
+      background: #ff8e80;
+      color: #fff;
     }
   </style>
 </head>
+
 <body>
+
+  <!-- 로그인 -->
   <section id="loginSection">
-    <input id="userId" type="text" placeholder="ID 입력" />
-    <button onclick="login()">Login</button>
+    <div class="loginBox">
+      <h1>Couple Diary</h1>
+      <input id="userId" type="text" placeholder="Enter your ID (예: SM0710)" />
+      <button onclick="login()">Login</button>
+    </div>
   </section>
 
+  <!-- 대시보드 -->
   <section id="dashboard">
-    <div id="topBar">
-      <span id="userLabel"></span>
-      <button onclick="logout()">Logout</button>
-    </div>
+    <div class="topBar" id="userNameDisplay"></div>
+    <button class="logoutBtn" onclick="logout()">Logout</button>
 
-    <div id="leftPanel">
-      <h3>투데이 로그</h3>
-      <div id="todayLogList"></div>
-      <input id="todayLogInput" placeholder="오늘의 기록 입력" onkeypress="if(event.key==='Enter')addTodayLog()" />
-    </div>
+    <div class="dashboardLayout">
+      <!-- 왼쪽 (김솔음) -->
+      <div class="userSection">
+        <h2>김솔음 🖤</h2>
+        <textarea id="todayLog" placeholder="오늘의 기록을 남겨보세요..."></textarea>
+        <div id="todayLogs" class="log"></div>
+      </div>
 
-    <div id="centerPanel">
-      <input type="file" accept="image/*" onchange="uploadPhoto(event)" />
-      <img id="photoDisplay" src="" alt="couple photo" />
-      <div id="playlist"></div>
-      <input id="playlistInput" placeholder="YouTube 링크 입력" onkeypress="if(event.key==='Enter')addPlaylist()" />
-    </div>
+      <!-- 가운데 (사진) -->
+      <div class="photoBox">
+        <img id="couplePhoto" src="https://via.placeholder.com/350x450?text=Couple+Photo" alt="Couple Photo" ondblclick="uploadPhoto()" />
+      </div>
 
-    <div id="rightPanel">
-      <h3>대화 로그</h3>
-      <div id="chatList"></div>
-      <input id="chatInput" placeholder="대화 입력" onkeypress="if(event.key==='Enter')addChat()" />
+      <!-- 오른쪽 (최요원) -->
+      <div class="userSection">
+        <h2>최요원 💙</h2>
+        <textarea id="chatLog" placeholder="서로에게 남기고 싶은 말을 써보세요..."></textarea>
+        <div id="chat" class="log"></div>
+        <div class="playlist" id="playlist"></div>
+      </div>
     </div>
   </section>
+
+  <script>
+    // 로그인
+    function login() {
+      const userId = document.getElementById("userId").value.trim();
+      let userName = "";
+      let heartColor = "";
+
+      if (userId === "SM0710") {
+        userName = "김솔음 🖤";
+        heartColor = "black";
+      } else if (userId === "CY0710") {
+        userName = "최요원 💙";
+        heartColor = "navy";
+      } else {
+        alert("등록되지 않은 ID입니다!");
+        return;
+      }
+
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("userName", userName);
+      localStorage.setItem("heartColor", heartColor);
+
+      document.getElementById("loginSection").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("userNameDisplay").innerHTML = `${userName}`;
+    }
+
+    // 로그아웃
+    function logout() {
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("heartColor");
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("loginSection").style.display = "flex";
+    }
+
+    // 더블클릭 사진 업로드
+    function uploadPhoto() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          document.getElementById("couplePhoto").src = event.target.result;
+          localStorage.setItem("couplePhoto", event.target.result);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    // 로그인 상태 유지
+    window.onload = () => {
+      const savedUser = localStorage.getItem("userId");
+      const savedPhoto = localStorage.getItem("couplePhoto");
+      if (savedUser) {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("userNameDisplay").innerHTML = localStorage.getItem("userName");
+      }
+      if (savedPhoto) {
+        document.getElementById("couplePhoto").src = savedPhoto;
+      }
+    };
+  </script>
+
 </body>
 </html>
