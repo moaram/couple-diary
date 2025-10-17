@@ -10,23 +10,25 @@
       --accent: #344054;
       --primary-soft: #f2b6bb;
       --secondary-soft: #b3c7e6;
-      --muted: #6e6e6e;
     }
     body {
-      margin: 0;
       font-family: "Noto Sans KR", sans-serif;
       background: linear-gradient(135deg, rgba(242,182,187,0.15), rgba(179,199,230,0.1));
-      color: #333;
       overflow: hidden;
     }
 
-    /* 로그인 화면 중앙 배치 */
-    #login-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    /* 페이드 인/아웃 */
+    .fade {
       transition: opacity 0.7s ease;
+    }
+    .hidden-section {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .visible-section {
+      opacity: 1;
+      visibility: visible;
     }
 
     /* 하트 애니메이션 */
@@ -39,33 +41,34 @@
       100% { transform: scale(1); }
     }
 
-    /* 페이드 인 */
-    .fade-in {
-      animation: fadeIn 1s ease forwards;
+    .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .layout-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
-
-    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-    .panel { background: #fff; border-radius: 14px; padding: 1rem; box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); }
-    .layout-row { display: flex; flex-wrap: wrap; gap: 1rem; }
-    .left, .right, .center { flex: 1 1 300px; display: flex; flex-direction: column; gap: 0.8rem; }
-
-    /* 사진 */
-    .photo-box img {
-      width: 100%;
+    .left, .center, .right {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    textarea, input {
+      border: 1px solid rgba(0,0,0,0.08);
       border-radius: 10px;
-      object-fit: cover;
-      cursor: pointer;
-      max-height: 480px;
-      transition: transform 0.3s;
+      padding: 0.6rem;
     }
-    .photo-box img:hover { transform: scale(1.01); }
-
-    /* 플레이리스트 */
+    button.primary {
+      background: var(--accent);
+      color: white;
+      border-radius: 10px;
+      padding: 0.55rem 0.8rem;
+    }
     #music-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -75,61 +78,30 @@
       width: 100%;
       border-radius: 10px;
     }
-
-    h2 { font-size: 1rem; color: var(--accent); font-weight: 600; margin: 0; }
-    input, textarea {
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 10px;
-      padding: 0.6rem;
-      font-size: 0.9rem;
-    }
-    button.primary {
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 0.55rem 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button.primary:hover { background: #222; }
-    .item {
-      background: #fafafa;
-      border-radius: 8px;
-      padding: 0.6rem;
-      border: 1px solid rgba(0,0,0,0.04);
-      font-size: 0.9rem;
-    }
-    .meta {
-      font-size: 0.78rem;
-      color: #7b7b7b;
-      margin-top: 2px;
-    }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
+  <div class="container mx-auto max-w-6xl p-4">
+    <header class="flex justify-between items-center mb-4">
       <div id="user-display" class="text-gray-600 text-sm"></div>
       <button id="logout-btn" class="hidden primary">Logout</button>
     </header>
 
     <!-- 로그인 -->
-    <section id="login-section">
+    <section id="login-section" class="fade visible-section flex justify-center items-center min-h-[80vh]">
       <div class="panel w-full max-w-sm text-center">
         <div class="flex justify-center mb-3">
           <div id="login-heart" class="text-4xl">🤍</div>
         </div>
-        <h2 class="mb-2">Login</h2>
+        <h2 class="mb-2 font-semibold">Login</h2>
         <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text" class="w-full mb-3" />
         <button id="login-btn" class="primary w-full">Login</button>
       </div>
     </section>
 
     <!-- 대시보드 -->
-    <main id="dashboard" class="hidden fade-in">
+    <main id="dashboard" class="fade hidden-section">
       <div class="layout-row">
         <section class="panel left">
           <h2>🖤 Today Log</h2>
@@ -140,16 +112,15 @@
 
         <section class="panel center">
           <h2>📸 Couple Photo</h2>
-          <div class="photo-box mt-2">
-            <img id="couple-photo" src="https://via.placeholder.com/400x400.png?text=Couple+Photo" alt="couple" />
-          </div>
+          <img id="couple-photo" src="https://via.placeholder.com/400x400.png?text=Couple+Photo"
+               class="rounded-xl mt-2 cursor-pointer" />
           <input type="file" id="photo-upload" accept="image/*" class="hidden" />
         </section>
 
         <section class="panel right">
           <h2>💬 Chat Log</h2>
           <div id="chat-box" class="mt-2 max-h-[300px] overflow-auto flex flex-col gap-2"></div>
-          <input id="chat-input" type="text" placeholder="메시지를 입력하세요" />
+          <input id="chat-input" placeholder="메시지를 입력하세요" />
           <button id="send-btn" class="primary mt-1">보내기</button>
         </section>
       </div>
@@ -167,205 +138,59 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
-      updateDoc, doc, getDoc
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const app = initializeApp({
       apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
       authDomain: "couple-diary-42d49.firebaseapp.com",
       projectId: "couple-diary-42d49",
-      storageBucket: "couple-diary-42d49.firebasestorage.app",
-      messagingSenderId: "162533479109",
-      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
-    };
-
-    const app = initializeApp(firebaseConfig);
+    });
     const db = getFirestore(app);
 
-    const loginBtn = document.getElementById("login-btn");
-    const loginInput = document.getElementById("login-id");
     const loginSection = document.getElementById("login-section");
     const dashboard = document.getElementById("dashboard");
+    const loginBtn = document.getElementById("login-btn");
+    const loginInput = document.getElementById("login-id");
     const heartLogo = document.getElementById("login-heart");
-    const logoutBtn = document.getElementById("logout-btn");
     const userDisplay = document.getElementById("user-display");
-
-    const todayList = document.getElementById("today-list");
-    const chatBox = document.getElementById("chat-box");
-    const todayText = document.getElementById("today-text");
-    const todaySave = document.getElementById("today-save");
-    const chatInput = document.getElementById("chat-input");
-    const sendBtn = document.getElementById("send-btn");
-    const musicAdd = document.getElementById("music-add");
-    const musicInput = document.getElementById("music-link");
-    const musicList = document.getElementById("music-list");
-    const couplePhoto = document.getElementById("couple-photo");
-    const photoUpload = document.getElementById("photo-upload");
+    const logoutBtn = document.getElementById("logout-btn");
 
     let currentUser = null;
 
-    loginBtn.addEventListener("click", login);
-    loginInput.addEventListener("keypress", e => e.key === "Enter" && login());
+    loginBtn.addEventListener("click", handleLogin);
+    loginInput.addEventListener("keypress", e => e.key === "Enter" && handleLogin());
 
-    function login() {
+    function handleLogin() {
       const id = loginInput.value.trim();
       if (id === "SM0710") currentUser = { name: "김솔음", heart: "🖤" };
       else if (id === "CY0710") currentUser = { name: "최요원", heart: "💙" };
       else return alert("등록되지 않은 ID입니다.");
 
       heartLogo.classList.add("heart-pop");
+
       setTimeout(() => {
-        loginSection.classList.add("opacity-0", "transition-opacity", "duration-700");
-        setTimeout(() => {
-          loginSection.classList.add("hidden");
-          dashboard.classList.remove("hidden");
-          dashboard.classList.add("fade-in");
-          userDisplay.textContent = `${currentUser.name} ${currentUser.heart}`;
-          logoutBtn.classList.remove("hidden");
-          loadAllData();
-          window.scrollTo(0, 0);
-          document.body.style.overflow = "hidden";
-        }, 700);
-      }, 500);
+        fadeSwitch(loginSection, dashboard);
+        userDisplay.textContent = `${currentUser.name} ${currentUser.heart}`;
+        logoutBtn.classList.remove("hidden");
+      }, 600);
     }
 
     logoutBtn.addEventListener("click", () => {
+      fadeSwitch(dashboard, loginSection);
       currentUser = null;
-      dashboard.classList.add("hidden");
-      loginSection.classList.remove("hidden");
-      loginSection.classList.remove("opacity-0");
-      logoutBtn.classList.add("hidden");
       userDisplay.textContent = "";
+      logoutBtn.classList.add("hidden");
+      loginInput.value = "";
       heartLogo.textContent = "🤍";
     });
 
-    function formatTime(ts) {
-      const d = ts?.toDate ? ts.toDate() : new Date();
-      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${d.getHours()}시 ${String(d.getMinutes()).padStart(2,'0')}분`;
-    }
-
-    // --- Firestore Loaders ---
-    function loadAllData() { loadToday(); loadChat(); loadMusic(); }
-
-    todaySave.addEventListener("click", async () => {
-      if (!currentUser) return;
-      const text = todayText.value.trim();
-      if (!text) return;
-      await addDoc(collection(db, "todayLogs"), {
-        text,
-        updatedBy: currentUser.name,
-        timestamp: serverTimestamp(),
-      });
-      todayText.value = "";
-    });
-
-    function loadToday() {
-      const q = query(collection(db, "todayLogs"), orderBy("timestamp", "desc"));
-      onSnapshot(q, snap => {
-        todayList.innerHTML = "";
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          const el = document.createElement("div");
-          el.className = "item";
-          el.innerHTML = `
-            <div class="flex justify-between items-start">
-              <div>
-                <div>${escapeHtml(d.text)}</div>
-                <div class="meta">by ${d.updatedBy} • ${formatTime(d.timestamp)}</div>
-              </div>
-              ${d.updatedBy === currentUser?.name ? `<button class="ghost edit-today" data-id="${docSnap.id}">수정</button>` : ""}
-            </div>`;
-          todayList.appendChild(el);
-        });
-      });
-    }
-
-    sendBtn.addEventListener("click", sendChat);
-    chatInput.addEventListener("keypress", e => { if (e.key === "Enter") sendChat(); });
-
-    async function sendChat() {
-      if (!currentUser) return;
-      const msg = chatInput.value.trim();
-      if (!msg) return;
-      await addDoc(collection(db, "chat"), {
-        name: currentUser.name,
-        heart: currentUser.heart,
-        message: msg,
-        timestamp: serverTimestamp(),
-      });
-      chatInput.value = "";
-    }
-
-    function loadChat() {
-      const q = query(collection(db, "chat"), orderBy("timestamp", "desc"));
-      onSnapshot(q, snap => {
-        chatBox.innerHTML = "";
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          const el = document.createElement("div");
-          el.className = "item text-right";
-          el.innerHTML = `
-            <div>
-              <div><strong>${d.name}</strong> ${d.heart}</div>
-              <div>${escapeHtml(d.message)}</div>
-              <div class="meta">${formatTime(d.timestamp)}</div>
-            </div>`;
-          chatBox.appendChild(el);
-        });
-      });
-    }
-
-    musicAdd.addEventListener("click", async () => {
-      if (!currentUser) return;
-      const url = musicInput.value.trim();
-      if (!url) return;
-      await addDoc(collection(db, "playlist"), {
-        url,
-        addedBy: currentUser.name,
-        timestamp: serverTimestamp(),
-      });
-      musicInput.value = "";
-    });
-
-    function loadMusic() {
-      const q = query(collection(db, "playlist"), orderBy("timestamp", "desc"));
-      onSnapshot(q, snap => {
-        musicList.innerHTML = "";
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          const vid = extractYouTubeId(d.url);
-          if (!vid) return;
-          const el = document.createElement("div");
-          el.className = "bg-white rounded-xl border border-gray-100 shadow-sm p-2";
-          el.innerHTML = `
-            <iframe src="https://www.youtube.com/embed/${vid}?rel=0" allow="autoplay; encrypted-media" class="h-40 border-0"></iframe>
-            <div class="text-sm mt-1">${escapeHtml(d.addedBy)}</div>`;
-          musicList.appendChild(el);
-        });
-      });
-    }
-
-    // 사진 업로드
-    couplePhoto.addEventListener("dblclick", () => photoUpload.click());
-    photoUpload.addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        couplePhoto.src = reader.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    function extractYouTubeId(url) {
-      const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{6,11})(?:[&?]|$)/);
-      return m ? m[1] : null;
-    }
-
-    function escapeHtml(t) {
-      return t?.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;") || "";
+    function fadeSwitch(fromEl, toEl) {
+      fromEl.classList.remove("visible-section");
+      fromEl.classList.add("hidden-section");
+      setTimeout(() => {
+        toEl.classList.remove("hidden-section");
+        toEl.classList.add("visible-section");
+      }, 700);
     }
   </script>
 </body>
