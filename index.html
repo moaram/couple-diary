@@ -77,7 +77,7 @@
         todayLogs.innerHTML = "";
         snap.forEach(docSnap => {
           const d = docSnap.data();
-          const mine = updateBy === currentUser?.name;
+          const mine = d.updateBy === currentUser?.name;
           todayLogs.innerHTML += `
             <div class="logCard">
               <div class="logTop">
@@ -366,4 +366,3 @@
   </div>
 </body>
 </html>
-
