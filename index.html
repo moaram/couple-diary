@@ -369,3 +369,18 @@
 
     photoInput.addEventListener("change", async (e) => {
       if (!currentUser || currentUser.name !== "최요원") return;
+      const file = e.target.files[0];
+      if (!file) return;
+      const fileRef = ref(storage, `couple-photo/${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      await addDoc(collection(db, "photo"), { url, time: serverTimestamp(), uploadedBy: currentUser.name });
+      photoImg.src = url;
+    });
+
+    // utils
+    function escapeHtml(str){return str.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+    function extractYouTubeId(url){const m=url.match(/(?:v=|be\/)([\w-]+)/);return m?m[1]:url;}
+  </script>
+</body>
+</html>
