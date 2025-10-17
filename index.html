@@ -77,7 +77,7 @@
         todayLogs.innerHTML = "";
         snap.forEach(docSnap => {
           const d = docSnap.data();
-          const mine = d.updateBy === currentUser?.name;
+          const mine = updateBy === currentUser?.name;
           todayLogs.innerHTML += `
             <div class="logCard">
               <div class="logTop">
@@ -325,8 +325,8 @@
 
 <body>
   <div id="loginPage">
-    <h2>💕 Couple Diary 💕</h2>
-    <input id="loginCode" placeholder="코드 입력 (SM0710 / CY0710)" />
+    <h2>🤍</h2>
+    <input id="loginCode" placeholder="ID 입력 (SM0710)" />
     <button onclick="login()">로그인</button>
   </div>
 
@@ -345,7 +345,6 @@
       </section>
 
       <section id="photoSection" class="section">
-        <h3>📷 사진</h3>
         <input type="file" accept="image/*" onchange="uploadPhoto(event)" />
         <div id="photoGallery"></div>
       </section>
@@ -367,3 +366,4 @@
   </div>
 </body>
 </html>
+
