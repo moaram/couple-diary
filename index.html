@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Couple Diary — Login Fix</title>
+<title>Couple Diary</title>
 <style>
   :root{
     --coral:#ff8b7a;
@@ -11,436 +11,287 @@
     --soft:#faf9f8;
   }
   *{box-sizing:border-box}
-  html,body{height:100%; margin:0; font-family:Inter, "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto; background:#fff; color:var(--navy);}
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:Inter, "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto;
+    background:#fff;
+    color:var(--navy);
+  }
 
-  /* 전체 레이아웃: 로그인 / 대시보드는 절대 위치로 겹치게 */
   .screen {
     position:fixed;
     inset:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    -webkit-tap-highlight-color:transparent;
     background:linear-gradient(180deg,#fff,#fcfbfa);
   }
 
-  /* 로그인 박스 */
   .login-card {
-    width: min(420px, 92%);
-    background: #fff;
+    width:min(420px,92%);
+    background:#fff;
     border-radius:14px;
     padding:28px;
     box-shadow:0 12px 40px rgba(39,49,64,0.06);
     text-align:center;
-    transform-origin:center;
     animation:cardIn 0.45s ease;
   }
   @keyframes cardIn {
     from { opacity: 0; transform: translateY(14px) scale(.995); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
-
-  .brand {
-    font-size:20px; font-weight:700; color:var(--navy); margin-bottom:10px;
-  }
-  .heart {
-    font-size:34px; display:block; margin: 6px auto 10px; animation:heartPop 1.2s ease-in-out infinite alternate;
-  }
+  .brand { font-size:20px; font-weight:700; color:var(--navy); margin-bottom:10px; }
+  .heart { font-size:34px; display:block; margin:6px auto 10px; animation:heartPop 1.2s ease-in-out infinite alternate; }
   @keyframes heartPop { from { transform: scale(1); } to { transform: scale(1.08); } }
 
-  .input-row { display:flex; gap:10px; margin-top:16px; align-items:center; justify-content:center; }
   .login-input {
-    width:100%;
-    padding:12px 14px;
-    border-radius:10px;
-    border:1px solid #e6e6e6;
-    font-size:15px;
-    outline:none;
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid #e6e6e6;
+    font-size:15px; outline:none; margin-bottom:10px;
   }
-  .login-input:focus { box-shadow: 0 4px 18px rgba(160,160,160,0.08); border-color:var(--coral); }
+  .login-input:focus { box-shadow:0 4px 18px rgba(160,160,160,0.08); border-color:var(--coral); }
 
   .login-btn {
-    background:var(--coral);
-    color:#fff;
-    border:none;
-    padding:12px 18px;
-    border-radius:10px;
-    font-weight:600;
-    cursor:pointer;
-    font-size:15px;
+    background:var(--coral); color:#fff; border:none; padding:12px 18px;
+    border-radius:10px; font-weight:600; cursor:pointer; font-size:15px;
   }
-  .login-btn:active { transform: translateY(1px); }
 
-  /* 작은 보조 텍스트 */
-  .muted { font-size:13px; color:#6b7280; margin-top:10px; }
-
-  /* 대시보드: 초깃값은 숨김(완전한 overlay로 로그인과 겹침) */
   #dashboard {
-    position:fixed;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    gap:18px;
-    padding-top:28px;
-    overflow:auto;
-    background: #fff;
-    opacity:0; pointer-events:none;
-    transition: opacity .45s ease;
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    gap:18px; padding-top:28px; overflow:auto;
+    background:#fff; opacity:0; pointer-events:none;
+    transition:opacity .45s ease;
   }
   #dashboard.show { opacity:1; pointer-events:auto; }
 
   .topbar {
     width:min(1100px,95%);
-    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    display:flex; justify-content:space-between; align-items:center;
   }
   .user-display { font-weight:600; color:var(--navy); }
 
+  .logout-btn {
+    background:transparent; border:1px solid var(--navy);
+    color:var(--navy); padding:6px 10px; border-radius:8px;
+    cursor:pointer; font-size:13px; font-weight:500;
+    transition:all .2s ease;
+  }
+  .logout-btn:hover { background:var(--navy); color:#fff; }
+
   .grid {
     width:min(1100px,95%);
-    display:flex;
-    gap:16px;
-    align-items:flex-start;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin-top:6px;
+    display:flex; gap:16px; flex-wrap:wrap;
+    justify-content:center; margin-top:6px;
   }
 
   .panel {
-    background:#fff;
-    border-radius:12px;
-    padding:14px;
+    background:#fff; border-radius:12px; padding:14px;
     box-shadow:0 8px 24px rgba(39,49,64,0.04);
     border:1px solid rgba(0,0,0,0.04);
-    flex:1 1 300px;
-    min-width:260px;
-    max-width:420px;
+    flex:1 1 300px; min-width:260px; max-width:420px;
   }
-  .panel h3 { margin:0 0 8px 0; font-size:16px; color:var(--navy) }
+  .panel h3 { margin:0 0 8px 0; font-size:16px; color:var(--navy); }
+
   textarea {
     width:100%; min-height:88px; resize:vertical;
     border:1px solid #e6e6e6; border-radius:8px; padding:10px; font-size:14px;
   }
-  .save-btn { margin-top:8px; background:var(--coral); color:#fff; border:none; padding:9px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
 
-  /* 로그 항목 */
+  .save-btn {
+    margin-top:8px; background:var(--coral); color:#fff;
+    border:none; padding:9px 12px; border-radius:8px; cursor:pointer; font-weight:600;
+  }
+
   .log { margin-top:10px; display:flex; flex-direction:column; gap:8px; max-height:320px; overflow:auto; padding-right:6px; }
   .entry { background:#fbfbfb; padding:10px; border-radius:8px; font-size:14px; box-shadow:0 2px 6px rgba(0,0,0,0.03) }
   .meta { font-size:12px; color:#6b7280; margin-top:6px }
 
-  /* 플레이리스트 행 */
   .playlist-wrap { width:min(1100px,95%); margin-bottom:36px; }
-  .playlist-controls { display:flex; gap:8px; margin-bottom:12px; }
-  .playlist-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px; }
+  .playlist-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
 
-  /* 반응형 개선 */
   @media(max-width:860px){
-    .grid { flex-direction:column; align-items:stretch; padding:12px; }
-    .panel { max-width:100% }
-    .login-card { width:92%; padding:20px; }
+    .grid{flex-direction:column; align-items:stretch; padding:12px;}
+    .panel{max-width:100%;}
   }
 </style>
 </head>
 <body>
-
-  <!-- 로그인 화면 -->
-  <div class="screen" id="loginScreen" aria-hidden="false">
-    <div class="login-card" role="dialog" aria-label="Login">
-      <div class="heart" aria-hidden="true">🤍</div>
+  <div class="screen" id="loginScreen">
+    <div class="login-card">
+      <div class="heart">🤍</div>
       <div class="brand">Couple Diary</div>
-
-      <div class="input-row" style="width:100%; margin-top:8px;">
-        <input id="loginId" class="login-input" placeholder="ID 입력 (SM0710 / CY0710)" aria-label="ID 입력" />
-      </div>
-
-      <div style="margin-top:14px;">
-        <button id="loginBtn" class="login-btn" aria-label="로그인 버튼">Login</button>
-      </div>
-
-      <div class="muted">SM0710 = 김솔음 (🖤) · CY0710 = 최요원 (💙)</div>
+      <input id="loginId" class="login-input" placeholder="ID 입력 (SM0710 / CY0710)" />
+      <button id="loginBtn" class="login-btn">Login</button>
+      <div style="font-size:13px;color:#6b7280;margin-top:10px;">SM0710 = 김솔음 (🖤) · CY0710 = 최요원 (💙)</div>
     </div>
   </div>
 
-  <!-- 대시보드 화면 -->
-  <main id="dashboard" role="main" aria-hidden="true">
+  <main id="dashboard">
     <div class="topbar">
       <div id="dateDisplay" style="color:#6b7280"></div>
-      <div class="user-display" id="userDisplay"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="user-display" id="userDisplay"></div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
     </div>
 
-    <div class="grid" role="region" aria-label="Main sections">
-      <section class="panel" aria-labelledby="todayTitle">
-        <h3 id="todayTitle">🖤 Today Log</h3>
+    <div class="grid">
+      <section class="panel">
+        <h3>🖤 Today Log</h3>
         <textarea id="todayInput" placeholder="오늘의 기록을 남겨보세요..."></textarea>
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <button id="saveToday" class="save-btn">저장</button>
-        </div>
-        <div class="log" id="todayList" aria-live="polite"></div>
+        <button id="saveToday" class="save-btn">저장</button>
+        <div class="log" id="todayList"></div>
       </section>
 
-      <section class="panel" aria-labelledby="photoTitle" id="photoPanel">
-        <h3 id="photoTitle">📸 Couple Photo (더블클릭 업로드)</h3>
-        <div id="photoBox" style="border-radius:10px; overflow:hidden; background:#f6f6f6; min-height:220px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
-          <img id="photoImg" src="https://via.placeholder.com/520x360?text=Couple+Photo" alt="couple" style="max-width:100%; height:auto; display:block;" />
+      <section class="panel">
+        <h3>📸 Couple Photo (더블클릭 업로드)</h3>
+        <div id="photoBox" style="border-radius:10px;overflow:hidden;background:#f6f6f6;min-height:220px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <img id="photoImg" src="https://via.placeholder.com/520x360?text=Couple+Photo" alt="couple" style="max-width:100%;height:auto;display:block;" />
         </div>
         <input type="file" id="photoFile" accept="image/*" style="display:none" />
       </section>
 
-      <section class="panel" aria-labelledby="chatTitle">
-        <h3 id="chatTitle">💙 Chat Log</h3>
+      <section class="panel">
+        <h3>💙 Chat Log</h3>
         <textarea id="chatInput" placeholder="메시지를 입력하세요..."></textarea>
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <button id="sendChat" class="save-btn">보내기</button>
-        </div>
-        <div class="log" id="chatList" aria-live="polite"></div>
+        <button id="sendChat" class="save-btn">보내기</button>
+        <div class="log" id="chatList"></div>
       </section>
     </div>
 
     <div class="playlist-wrap">
-      <div class="playlist-controls" style="width:min(1100px,95%); margin:0 auto 8px;">
-        <input id="musicUrl" placeholder="YouTube 링크 입력" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e7e7e7" />
-        <button id="addMusic" class="save-btn">추가</button>
-      </div>
-      <div class="playlist-grid" id="playlistGrid" style="width:min(1100px,95%); margin:0 auto 40px;"></div>
+      <input id="musicUrl" placeholder="YouTube 링크 입력" style="width:80%;padding:10px;border-radius:8px;border:1px solid #e7e7e7" />
+      <button id="addMusic" class="save-btn">추가</button>
+      <div class="playlist-grid" id="playlistGrid"></div>
     </div>
   </main>
 
 <script>
-/* -------------------------
-   로그인 / 대시보드 전환 (페이드 인)
-   - Enter 키로 로그인 동작
-   - 스크롤이 생기지 않게 body overflow 관리
-   ------------------------- */
+const loginScreen=document.getElementById('loginScreen');
+const loginBtn=document.getElementById('loginBtn');
+const loginId=document.getElementById('loginId');
+const dashboard=document.getElementById('dashboard');
+const logoutBtn=document.getElementById('logoutBtn');
+const userDisplay=document.getElementById('userDisplay');
+const dateDisplay=document.getElementById('dateDisplay');
 
-const loginScreen = document.getElementById('loginScreen');
-const loginId = document.getElementById('loginId');
-const loginBtn = document.getElementById('loginBtn');
-const dashboard = document.getElementById('dashboard');
-const userDisplay = document.getElementById('userDisplay');
-const dateDisplay = document.getElementById('dateDisplay');
-
-function setDate() {
-  const d = new Date();
-  dateDisplay.textContent = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+function setDate(){
+  const d=new Date();
+  dateDisplay.textContent=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 setDate();
 
-// 로그인 처리
-function performLogin() {
-  const id = loginId.value.trim();
-  if (!id) { alert('ID를 입력해주세요.'); loginId.focus(); return; }
-  if (id !== 'SM0710' && id !== 'CY0710') { alert('등록되지 않은 ID입니다. SM0710 또는 CY0710 입력해 주세요.'); loginId.focus(); return; }
-
-  // 현재 사용자 저장
-  const user = id === 'SM0710' ? { id, name:'김솔음', heart:'🖤' } : { id, name:'최요원', heart:'💙' };
-  localStorage.setItem('cd_current_user', JSON.stringify(user));
-
-  // 화면 전환 (페이드 인)
-  loginScreen.style.display = 'none';      // 완전 숨김으로 공간 제거
-  dashboard.classList.add('fade-in');
-  dashboard.classList.add('show');         // css로 opacity 제어
-  dashboard.style.opacity = 1;
-  dashboard.setAttribute('aria-hidden','false');
-
-  // 표시 업데이트
-  userDisplay.textContent = `${user.name} ${user.heart}`;
-
-  // 데이터 로드
-  loadAllLogs();
-  loadPlaylist();
-  loadPhoto();
-
-  // lock page scroll (optional in this UI we keep body overflow auto for dashboard)
-  document.body.style.overflow = 'auto';
-}
-
-// Enter 키로 로그인 가능
-loginId.addEventListener('keypress', (e) => { if (e.key === 'Enter') performLogin(); });
-loginBtn.addEventListener('click', performLogin);
-
-// 로그아웃 (간단)
-userDisplay.addEventListener('click', () => {
-  if (!confirm('로그아웃 하시겠어요?')) return;
-  localStorage.removeItem('cd_current_user');
-  dashboard.classList.remove('show');
-  dashboard.style.opacity = 0;
-  dashboard.setAttribute('aria-hidden','true');
-  // 로그인 화면 다시 보이게
-  loginScreen.style.display = 'flex';
-  loginId.value = '';
-  loginId.focus();
-  document.body.style.overflow = 'hidden';
-});
-
-
-/* -------------------------
-   저장/로컬 로직 (투데이/채팅/플레이리스트)
-   - 기존 데이터 유지: localStorage 사용
-   - 시간 표기는 YYYY.MM.DD HH:MM (시:분)
-   ------------------------- */
-
-function timeNow() {
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2,'0');
-  const mm = String(d.getMinutes()).padStart(2,'0');
+function timeNow(){
+  const d=new Date();
+  const hh=String(d.getHours()).padStart(2,'0');
+  const mm=String(d.getMinutes()).padStart(2,'0');
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${hh}:${mm}`;
 }
 
-/* Today */
-const todayInput = document.getElementById('todayInput');
-const saveToday = document.getElementById('saveToday');
-const todayList = document.getElementById('todayList');
+function performLogin(){
+  const id=loginId.value.trim();
+  if(id!=='SM0710' && id!=='CY0710'){alert('등록되지 않은 ID입니다.');return;}
+  const user=id==='SM0710'?{id,name:'김솔음',heart:'🖤'}:{id,name:'최요원',heart:'💙'};
+  localStorage.setItem('cd_current_user',JSON.stringify(user));
+  userDisplay.textContent=`${user.name} ${user.heart}`;
+  loginScreen.style.display='none';
+  dashboard.classList.add('show');
+  document.body.style.overflow='auto';
+  loadAll();
+}
+loginBtn.addEventListener('click',performLogin);
+loginId.addEventListener('keypress',e=>{if(e.key==='Enter')performLogin();});
 
-saveToday.addEventListener('click', () => {
-  const user = JSON.parse(localStorage.getItem('cd_current_user') || '{}');
-  if (!user.id) { alert('먼저 로그인하세요.'); return; }
-  const txt = todayInput.value.trim();
-  if (!txt) return alert('내용을 입력하세요.');
-  const arr = JSON.parse(localStorage.getItem('cd_today') || '[]');
-  arr.push({ user: user.name, id: user.id, text: txt, time: timeNow() });
-  localStorage.setItem('cd_today', JSON.stringify(arr));
-  todayInput.value = '';
-  renderToday();
+logoutBtn.addEventListener('click',()=>{
+  if(!confirm('로그아웃 하시겠어요?'))return;
+  localStorage.removeItem('cd_current_user');
+  dashboard.classList.remove('show');
+  loginScreen.style.display='flex';
+  loginId.value='';
+  document.body.style.overflow='hidden';
 });
-function renderToday() {
-  const arr = JSON.parse(localStorage.getItem('cd_today') || '[]');
-  todayList.innerHTML = '';
-  arr.slice().reverse().forEach(it => {
-    const el = document.createElement('div');
-    el.className = 'entry';
-    el.innerHTML = `<div><strong>${it.user}</strong> <span class="meta">${it.time}</span></div><div style="margin-top:6px">${escapeHtml(it.text)}</div>`;
-    todayList.appendChild(el);
+
+const todayInput=document.getElementById('todayInput');
+const saveToday=document.getElementById('saveToday');
+const todayList=document.getElementById('todayList');
+saveToday.onclick=()=>{
+  const user=JSON.parse(localStorage.getItem('cd_current_user')||'{}');
+  const txt=todayInput.value.trim(); if(!txt)return;
+  const arr=JSON.parse(localStorage.getItem('cd_today')||'[]');
+  arr.push({user:user.name,id:user.id,text:txt,time:timeNow()});
+  localStorage.setItem('cd_today',JSON.stringify(arr));
+  todayInput.value=''; renderToday();
+};
+function renderToday(){
+  const arr=JSON.parse(localStorage.getItem('cd_today')||'[]');
+  todayList.innerHTML='';
+  arr.slice().reverse().forEach(it=>{
+    todayList.innerHTML+=`<div class='entry'><strong>${it.user}</strong> <span class='meta'>${it.time}</span><div>${it.text}</div></div>`;
   });
 }
 
-/* Chat */
-const chatInput = document.getElementById('chatInput');
-const sendChat = document.getElementById('sendChat');
-const chatList = document.getElementById('chatList');
-
-sendChat.addEventListener('click', () => {
-  const user = JSON.parse(localStorage.getItem('cd_current_user') || '{}');
-  if (!user.id) { alert('먼저 로그인하세요.'); return; }
-  const txt = chatInput.value.trim();
-  if (!txt) return alert('메시지를 입력하세요.');
-  const arr = JSON.parse(localStorage.getItem('cd_chat') || '[]');
-  arr.push({ user: user.name, id: user.id, text: txt, time: timeNow() });
-  localStorage.setItem('cd_chat', JSON.stringify(arr));
-  chatInput.value = '';
-  renderChat();
-});
-function renderChat() {
-  const arr = JSON.parse(localStorage.getItem('cd_chat') || '[]');
-  chatList.innerHTML = '';
-  arr.slice().reverse().forEach(it => {
-    const el = document.createElement('div');
-    el.className = 'entry';
-    el.style.textAlign = 'right';
-    el.innerHTML = `<div><strong>${it.user}</strong> <span class="meta">${it.time}</span></div><div style="margin-top:6px">${escapeHtml(it.text)}</div>`;
-    chatList.appendChild(el);
+const chatInput=document.getElementById('chatInput');
+const sendChat=document.getElementById('sendChat');
+const chatList=document.getElementById('chatList');
+sendChat.onclick=()=>{
+  const user=JSON.parse(localStorage.getItem('cd_current_user')||'{}');
+  const txt=chatInput.value.trim(); if(!txt)return;
+  const arr=JSON.parse(localStorage.getItem('cd_chat')||'[]');
+  arr.push({user:user.name,id:user.id,text:txt,time:timeNow()});
+  localStorage.setItem('cd_chat',JSON.stringify(arr));
+  chatInput.value=''; renderChat();
+};
+function renderChat(){
+  const arr=JSON.parse(localStorage.getItem('cd_chat')||'[]');
+  chatList.innerHTML='';
+  arr.slice().reverse().forEach(it=>{
+    chatList.innerHTML+=`<div class='entry' style='text-align:right;'><strong>${it.user}</strong> <span class='meta'>${it.time}</span><div>${it.text}</div></div>`;
   });
 }
 
-/* Playlist */
-const addMusic = document.getElementById('addMusic');
-const musicUrl = document.getElementById('musicUrl');
-const playlistGrid = document.getElementById('playlistGrid');
-
-addMusic.addEventListener('click', () => {
-  const url = musicUrl.value.trim();
-  const user = JSON.parse(localStorage.getItem('cd_current_user') || '{}');
-  if (!user.id) { alert('먼저 로그인하세요.'); return; }
-  if (!url) return alert('링크를 입력하세요.');
-  const arr = JSON.parse(localStorage.getItem('cd_playlist') || '[]');
-  arr.push({ url, by: user.name, time: timeNow() });
-  localStorage.setItem('cd_playlist', JSON.stringify(arr));
-  musicUrl.value = '';
-  renderPlaylist();
-});
-
-function renderPlaylist() {
-  const arr = JSON.parse(localStorage.getItem('cd_playlist') || '[]');
-  playlistGrid.innerHTML = '';
-  arr.slice().reverse().forEach(it => {
-    const vid = extractYouTubeId(it.url);
-    const div = document.createElement('div');
-    div.className = 'panel';
-    div.style.padding = '8px';
-    div.innerHTML = vid
-      ? `<div style="position:relative;padding-top:56.25%"><iframe src="https://www.youtube.com/embed/${vid}" style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:8px" allowfullscreen></iframe></div><div class="meta" style="margin-top:8px">by ${escapeHtml(it.by)} • ${escapeHtml(it.time)}</div>`
-      : `<div class="meta">유효한 YouTube 링크가 아닙니다.</div>`;
-    playlistGrid.appendChild(div);
+const musicUrl=document.getElementById('musicUrl');
+const addMusic=document.getElementById('addMusic');
+const playlistGrid=document.getElementById('playlistGrid');
+addMusic.onclick=()=>{
+  const user=JSON.parse(localStorage.getItem('cd_current_user')||'{}');
+  const url=musicUrl.value.trim(); if(!url)return;
+  const arr=JSON.parse(localStorage.getItem('cd_playlist')||'[]');
+  arr.push({url,by:user.name,time:timeNow()});
+  localStorage.setItem('cd_playlist',JSON.stringify(arr));
+  musicUrl.value=''; renderPlaylist();
+};
+function extractYouTubeId(url){const m=url.match(/(?:v=|\/)([0-9A-Za-z_-]{6,11})(?:[&?]|$)/);return m?m[1]:null;}
+function renderPlaylist(){
+  const arr=JSON.parse(localStorage.getItem('cd_playlist')||'[]');
+  playlistGrid.innerHTML='';
+  arr.slice().reverse().forEach(it=>{
+    const vid=extractYouTubeId(it.url);
+    playlistGrid.innerHTML+= vid ?
+    `<div class='panel' style='padding:8px;'><div style='position:relative;padding-top:56.25%'><iframe src='https://www.youtube.com/embed/${vid}' style='position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:8px' allowfullscreen></iframe></div><div class='meta'>by ${it.by} • ${it.time}</div></div>` :
+    `<div class='meta'>잘못된 링크</div>`;
   });
 }
 
-/* Photo (더블클릭 업로드 — uses localStorage URL) */
-const photoBox = document.getElementById('photoBox');
-const photoImg = document.getElementById('photoImg');
-const photoFile = document.getElementById('photoFile');
-
-photoBox.addEventListener('dblclick', () => {
-  const user = JSON.parse(localStorage.getItem('cd_current_user') || '{}');
-  if (!user.id) { alert('먼저 로그인하세요.'); return; }
-  photoFile.click();
-});
-photoFile.addEventListener('change', async (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  // 브라우저에서 base64로 읽어서 localStorage에 저장 (작은 이미지만 권장)
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = reader.result;
-      // 저장
-      localStorage.setItem('cd_photo', data);
-      photoImg.src = data;
-    } catch (err) {
-      alert('이미지 저장 중 오류가 발생했습니다.');
-    }
-  };
+const photoBox=document.getElementById('photoBox');
+const photoImg=document.getElementById('photoImg');
+const photoFile=document.getElementById('photoFile');
+photoBox.ondblclick=()=>photoFile.click();
+photoFile.onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const reader=new FileReader();
+  reader.onload=()=>{localStorage.setItem('cd_photo',reader.result); photoImg.src=reader.result;};
   reader.readAsDataURL(f);
-});
+};
+function loadPhoto(){const p=localStorage.getItem('cd_photo');if(p)photoImg.src=p;}
 
-/* 유틸: 로드 모든 로그/플레이리스트/사진 */
-function loadAllLogs() { renderToday(); renderChat(); renderPlaylist(); }
-function loadPlaylist() { renderPlaylist(); }
-function loadPhoto() { const p = localStorage.getItem('cd_photo'); if (p) photoImg.src = p; }
+function loadAll(){renderToday();renderChat();renderPlaylist();loadPhoto();}
 
-/* small helpers */
-function extractYouTubeId(url) {
-  const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{6,11})(?:[&?]|$)/);
-  return m ? m[1] : null;
-}
-function escapeHtml(s) {
-  return String(s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-}
-
-/* 초기 자동 로그인 처리 — 만약 전에 로그인 정보 남아있으면 바로 진입 */
-(function init() {
-  const user = JSON.parse(localStorage.getItem('cd_current_user') || 'null');
-  if (user && (user.id === 'SM0710' || user.id === 'CY0710')) {
-    loginId.value = user.id;
-    performAutoLogin(user);
-  } else {
-    // 기본: 로그인 화면에서 body scroll 잠금
-    document.body.style.overflow = 'hidden';
-    loginId.focus();
-  }
-
-  // helper: auto login
-  function performAutoLogin(user) {
-    loginScreen.style.display = 'none';
-    dashboard.classList.add('show');
-    dashboard.style.opacity = 1;
-    dashboard.setAttribute('aria-hidden','false');
-    userDisplay.textContent = `${user.name} ${user.heart}`;
-    document.body.style.overflow = 'auto';
-    loadAllLogs();
-    loadPhoto();
-  }
+(function init(){
+  const user=JSON.parse(localStorage.getItem('cd_current_user')||'null');
+  if(user){userDisplay.textContent=`${user.name} ${user.heart}`;loginScreen.style.display='none';dashboard.classList.add('show');loadAll();}
+  else{document.body.style.overflow='hidden';}
 })();
 </script>
-
 </body>
 </html>
