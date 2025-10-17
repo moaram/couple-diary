@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Couple Diary</title>
   <style>
-    /* 🌸 기본 테마 */
     body {
       font-family: "Pretendard", sans-serif;
       background: #fffaf8;
@@ -14,7 +13,7 @@
       color: #2e2e2e;
     }
 
-    /* 로그인 섹션 */
+    /* 로그인 */
     #loginSection {
       display: flex;
       justify-content: center;
@@ -32,12 +31,6 @@
       padding: 40px 50px;
       border-radius: 25px;
       box-shadow: 0 10px 25px rgba(255, 150, 130, 0.25);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .loginBox:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(255, 150, 130, 0.35);
     }
 
     .loginBox h1 {
@@ -56,11 +49,6 @@
       text-align: center;
     }
 
-    #userId:focus {
-      border-color: #ff8e80;
-      box-shadow: 0 0 8px rgba(255, 150, 130, 0.4);
-    }
-
     button {
       background: #ff8e80;
       border: none;
@@ -71,7 +59,7 @@
       font-size: 1rem;
       cursor: pointer;
       font-weight: 600;
-      transition: transform 0.2s ease, background 0.3s ease;
+      transition: 0.3s;
     }
 
     button:hover {
@@ -84,7 +72,7 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* 🌿 대시보드 */
+    /* 대시보드 */
     #dashboard {
       display: none;
       height: 100vh;
@@ -100,13 +88,12 @@
       font-weight: 600;
       color: #444;
       font-size: 1.1rem;
-      opacity: 0;
-      animation: fadeIn 1.2s ease forwards 1s;
+      animation: fadeIn 1s ease forwards 1s;
     }
 
     .dashboardLayout {
       display: grid;
-      grid-template-columns: 1fr 1.2fr 1fr;
+      grid-template-columns: 1fr 1.1fr 1fr;
       height: 100%;
       gap: 20px;
       padding: 80px 50px 50px 50px;
@@ -119,23 +106,25 @@
       padding: 20px;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
       height: 90%;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .userSection h2 {
-      margin-top: 0;
       text-align: center;
       color: #ff8e80;
+      margin-top: 0;
     }
 
-    /* 커플사진 */
+    /* 중앙 사진 */
     .photoBox {
       text-align: center;
     }
 
     .photoBox img {
       width: 100%;
-      max-width: 350px;
+      max-width: 450px;
+      height: auto;
       border-radius: 20px;
       object-fit: cover;
       cursor: pointer;
@@ -147,10 +136,19 @@
       transform: scale(1.03);
     }
 
-    /* 로그 구역 */
+    /* 로그영역 */
+    .logBox {
+      flex: 1;
+      overflow-y: auto;
+      background: #fffdfb;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+      margin-top: 10px;
+    }
+
     textarea {
       width: 100%;
-      height: 150px;
       border-radius: 12px;
       border: 1.5px solid #ffb6a8;
       padding: 10px;
@@ -160,13 +158,20 @@
       background: #fffefc;
     }
 
-    .log {
-      margin-top: 20px;
-      font-size: 0.9rem;
+    .entry {
       background: #fff8f5;
-      padding: 10px;
-      border-radius: 12px;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .entry small {
+      display: block;
+      color: #999;
+      font-size: 0.75rem;
+      margin-top: 3px;
     }
 
     /* 플레이리스트 */
@@ -174,7 +179,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
     .songCard {
@@ -183,11 +188,7 @@
       padding: 10px;
       text-align: center;
       box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
-    }
-
-    .songCard:hover {
-      transform: translateY(-3px);
+      font-size: 0.85rem;
     }
 
     .logoutBtn {
@@ -201,12 +202,28 @@
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.2s ease;
+      transition: 0.2s;
     }
 
     .logoutBtn:hover {
       background: #ff8e80;
       color: #fff;
+    }
+
+    .inputArea {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .inputArea button {
+      padding: 10px 15px;
+      background: #ff8e80;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -228,23 +245,29 @@
     <button class="logoutBtn" onclick="logout()">Logout</button>
 
     <div class="dashboardLayout">
-      <!-- 왼쪽 (김솔음) -->
+      <!-- 왼쪽 : 투데이 로그 -->
       <div class="userSection">
-        <h2>김솔음 🖤</h2>
-        <textarea id="todayLog" placeholder="오늘의 기록을 남겨보세요..."></textarea>
-        <div id="todayLogs" class="log"></div>
+        <h2>투데이 로그</h2>
+        <div class="inputArea">
+          <textarea id="todayInput" placeholder="오늘의 기록을 남겨보세요..." rows="2"></textarea>
+          <button onclick="addTodayLog()">입력</button>
+        </div>
+        <div class="logBox" id="todayLogs"></div>
       </div>
 
-      <!-- 가운데 (사진) -->
+      <!-- 중앙 : 사진 -->
       <div class="photoBox">
-        <img id="couplePhoto" src="https://via.placeholder.com/350x450?text=Couple+Photo" alt="Couple Photo" ondblclick="uploadPhoto()" />
+        <img id="couplePhoto" src="https://via.placeholder.com/450x600?text=Couple+Photo" alt="Couple Photo" ondblclick="uploadPhoto()" />
       </div>
 
-      <!-- 오른쪽 (최요원) -->
+      <!-- 오른쪽 : 채팅 로그 -->
       <div class="userSection">
-        <h2>최요원 💙</h2>
-        <textarea id="chatLog" placeholder="서로에게 남기고 싶은 말을 써보세요..."></textarea>
-        <div id="chat" class="log"></div>
+        <h2>채팅 로그</h2>
+        <div class="inputArea">
+          <textarea id="chatInput" placeholder="메시지를 입력하세요..." rows="2"></textarea>
+          <button onclick="addChat()">입력</button>
+        </div>
+        <div class="logBox" id="chatLogs"></div>
         <div class="playlist" id="playlist"></div>
       </div>
     </div>
@@ -255,38 +278,30 @@
     function login() {
       const userId = document.getElementById("userId").value.trim();
       let userName = "";
-      let heartColor = "";
 
-      if (userId === "SM0710") {
-        userName = "김솔음 🖤";
-        heartColor = "black";
-      } else if (userId === "CY0710") {
-        userName = "최요원 💙";
-        heartColor = "navy";
-      } else {
-        alert("등록되지 않은 ID입니다!");
-        return;
-      }
+      if (userId === "SM0710") userName = "김솔음 🖤";
+      else if (userId === "CY0710") userName = "최요원 💙";
+      else { alert("등록되지 않은 ID입니다!"); return; }
 
       localStorage.setItem("userId", userId);
       localStorage.setItem("userName", userName);
-      localStorage.setItem("heartColor", heartColor);
 
       document.getElementById("loginSection").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
       document.getElementById("userNameDisplay").innerHTML = `${userName}`;
+
+      loadData();
     }
 
     // 로그아웃
     function logout() {
       localStorage.removeItem("userId");
       localStorage.removeItem("userName");
-      localStorage.removeItem("heartColor");
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("loginSection").style.display = "flex";
     }
 
-    // 더블클릭 사진 업로드
+    // 📸 사진 업로드
     function uploadPhoto() {
       const input = document.createElement("input");
       input.type = "file";
@@ -297,27 +312,114 @@
         const reader = new FileReader();
         reader.onload = (event) => {
           document.getElementById("couplePhoto").src = event.target.result;
-          localStorage.setItem("couplePhoto", event.target.result);
+          localStorage.setItem("photo", event.target.result);
         };
         reader.readAsDataURL(file);
       };
       input.click();
     }
 
-    // 로그인 상태 유지
+    // 💬 로그 저장
+    function addTodayLog() {
+      const input = document.getElementById("todayInput");
+      const text = input.value.trim();
+      if (!text) return;
+      const user = localStorage.getItem("userName");
+      const time = new Date().toLocaleString("ko-KR", { year:"2-digit", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      const logs = JSON.parse(localStorage.getItem("todayLogs") || "[]");
+      logs.push({ user, text, time });
+      localStorage.setItem("todayLogs", JSON.stringify(logs));
+      input.value = "";
+      renderToday();
+    }
+
+    function addChat() {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      const user = localStorage.getItem("userName");
+      const time = new Date().toLocaleString("ko-KR", { year:"2-digit", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      const chats = JSON.parse(localStorage.getItem("chatLogs") || "[]");
+      chats.push({ user, text, time });
+      localStorage.setItem("chatLogs", JSON.stringify(chats));
+      input.value = "";
+      renderChat();
+    }
+
+    function renderToday() {
+      const logs = JSON.parse(localStorage.getItem("todayLogs") || "[]");
+      const currentUser = localStorage.getItem("userName");
+      const box = document.getElementById("todayLogs");
+      box.innerHTML = logs.map((l, i) => `
+        <div class="entry" data-index="${i}">
+          ${l.text}
+          <small>${l.user} | ${l.time}</small>
+          ${l.user === currentUser ? `<button onclick="editToday(${i})">수정</button>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function renderChat() {
+      const logs = JSON.parse(localStorage.getItem("chatLogs") || "[]");
+      const currentUser = localStorage.getItem("userName");
+      const box = document.getElementById("chatLogs");
+      box.innerHTML = logs.map((l, i) => `
+        <div class="entry" data-index="${i}">
+          ${l.text}
+          <small>${l.user} | ${l.time}</small>
+          ${l.user === currentUser ? `<button onclick="editChat(${i})">수정</button>` : ""}
+        </div>
+      `).join("");
+    }
+
+    function editToday(i) {
+      const logs = JSON.parse(localStorage.getItem("todayLogs") || "[]");
+      const currentUser = localStorage.getItem("userName");
+      if (logs[i].user !== currentUser) return;
+      const newText = prompt("수정할 내용을 입력하세요", logs[i].text);
+      if (newText !== null) {
+        logs[i].text = newText;
+        localStorage.setItem("todayLogs", JSON.stringify(logs));
+        renderToday();
+      }
+    }
+
+    function editChat(i) {
+      const logs = JSON.parse(localStorage.getItem("chatLogs") || "[]");
+      const currentUser = localStorage.getItem("userName");
+      if (logs[i].user !== currentUser) return;
+      const newText = prompt("수정할 내용을 입력하세요", logs[i].text);
+      if (newText !== null) {
+        logs[i].text = newText;
+        localStorage.setItem("chatLogs", JSON.stringify(logs));
+        renderChat();
+      }
+    }
+
+    // Enter로도 입력
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        if (document.activeElement.id === "todayInput") { addTodayLog(); e.preventDefault(); }
+        if (document.activeElement.id === "chatInput") { addChat(); e.preventDefault(); }
+      }
+    });
+
+    // 로드
+    function loadData() {
+      if (localStorage.getItem("photo")) document.getElementById("couplePhoto").src = localStorage.getItem("photo");
+      renderToday();
+      renderChat();
+    }
+
     window.onload = () => {
       const savedUser = localStorage.getItem("userId");
-      const savedPhoto = localStorage.getItem("couplePhoto");
       if (savedUser) {
         document.getElementById("loginSection").style.display = "none";
         document.getElementById("dashboard").style.display = "block";
         document.getElementById("userNameDisplay").innerHTML = localStorage.getItem("userName");
-      }
-      if (savedPhoto) {
-        document.getElementById("couplePhoto").src = savedPhoto;
+        loadData();
       }
     };
   </script>
-
 </body>
 </html>
