@@ -79,12 +79,16 @@
       overflow: hidden;
       background: #fffaf8;
       animation: fadeIn 1s ease forwards;
+      position: relative;
     }
 
     .topBar {
       position: absolute;
       top: 20px;
       right: 30px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
       font-weight: 600;
       color: #444;
       font-size: 1.1rem;
@@ -94,9 +98,9 @@
     .dashboardLayout {
       display: grid;
       grid-template-columns: 1fr 1.1fr 1fr;
-      height: 100%;
+      height: 80%;
       gap: 20px;
-      padding: 80px 50px 50px 50px;
+      padding: 80px 50px 0 50px;
       align-items: center;
     }
 
@@ -105,7 +109,7 @@
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-      height: 90%;
+      height: 100%;
       display: flex;
       flex-direction: column;
     }
@@ -119,12 +123,16 @@
     /* 중앙 사진 */
     .photoBox {
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .photoBox img {
       width: 100%;
-      max-width: 450px;
-      height: auto;
+      max-width: 480px;
+      height: 600px;
       border-radius: 20px;
       object-fit: cover;
       cursor: pointer;
@@ -175,11 +183,23 @@
     }
 
     /* 플레이리스트 */
+    .playlistSection {
+      width: 100%;
+      padding: 15px 60px 25px 60px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .playlistSection h3 {
+      color: #ff8e80;
+      margin-bottom: 10px;
+    }
+
     .playlist {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-      margin-top: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
     }
 
     .songCard {
@@ -189,12 +209,41 @@
       text-align: center;
       box-shadow: 0 3px 6px rgba(0,0,0,0.05);
       font-size: 0.85rem;
+      position: relative;
+      transition: 0.3s;
+    }
+
+    .songCard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.1);
+    }
+
+    .deleteBtn {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: none;
+      border: none;
+      color: #ff8e80;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .playlistInput {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .playlistInput input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px solid #ffb6a8;
+      outline: none;
     }
 
     .logoutBtn {
-      position: absolute;
-      top: 20px;
-      left: 30px;
       background: transparent;
       border: 2px solid #ff8e80;
       color: #ff8e80;
@@ -229,7 +278,6 @@
 </head>
 
 <body>
-
   <!-- 로그인 -->
   <section id="loginSection">
     <div class="loginBox">
@@ -241,8 +289,10 @@
 
   <!-- 대시보드 -->
   <section id="dashboard">
-    <div class="topBar" id="userNameDisplay"></div>
-    <button class="logoutBtn" onclick="logout()">Logout</button>
+    <div class="topBar">
+      <div id="userNameDisplay"></div>
+      <button class="logoutBtn" onclick="logout()">Logout</button>
+    </div>
 
     <div class="dashboardLayout">
       <!-- 왼쪽 : 투데이 로그 -->
@@ -257,7 +307,7 @@
 
       <!-- 중앙 : 사진 -->
       <div class="photoBox">
-        <img id="couplePhoto" src="https://via.placeholder.com/450x600?text=Couple+Photo" alt="Couple Photo" ondblclick="uploadPhoto()" />
+        <img id="couplePhoto" src="https://via.placeholder.com/480x600?text=Couple+Photo" alt="Couple Photo" ondblclick="uploadPhoto()" />
       </div>
 
       <!-- 오른쪽 : 채팅 로그 -->
@@ -268,8 +318,17 @@
           <button onclick="addChat()">입력</button>
         </div>
         <div class="logBox" id="chatLogs"></div>
-        <div class="playlist" id="playlist"></div>
       </div>
+    </div>
+
+    <!-- 아래쪽 : 플레이리스트 -->
+    <div class="playlistSection">
+      <h3>🎵 플레이리스트</h3>
+      <div class="playlistInput">
+        <input id="playlistInput" placeholder="노래 제목 또는 링크를 입력하세요" />
+        <button onclick="addSong()">추가</button>
+      </div>
+      <div class="playlist" id="playlist"></div>
     </div>
   </section>
 
@@ -293,7 +352,6 @@
       loadData();
     }
 
-    // 로그아웃
     function logout() {
       localStorage.removeItem("userId");
       localStorage.removeItem("userName");
@@ -301,7 +359,6 @@
       document.getElementById("loginSection").style.display = "flex";
     }
 
-    // 📸 사진 업로드
     function uploadPhoto() {
       const input = document.createElement("input");
       input.type = "file";
@@ -319,13 +376,13 @@
       input.click();
     }
 
-    // 💬 로그 저장
+    // 투데이 로그
     function addTodayLog() {
       const input = document.getElementById("todayInput");
       const text = input.value.trim();
       if (!text) return;
       const user = localStorage.getItem("userName");
-      const time = new Date().toLocaleString("ko-KR", { year:"2-digit", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      const time = new Date().toLocaleString("ko-KR");
       const logs = JSON.parse(localStorage.getItem("todayLogs") || "[]");
       logs.push({ user, text, time });
       localStorage.setItem("todayLogs", JSON.stringify(logs));
@@ -333,12 +390,13 @@
       renderToday();
     }
 
+    // 채팅 로그
     function addChat() {
       const input = document.getElementById("chatInput");
       const text = input.value.trim();
       if (!text) return;
       const user = localStorage.getItem("userName");
-      const time = new Date().toLocaleString("ko-KR", { year:"2-digit", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+      const time = new Date().toLocaleString("ko-KR");
       const chats = JSON.parse(localStorage.getItem("chatLogs") || "[]");
       chats.push({ user, text, time });
       localStorage.setItem("chatLogs", JSON.stringify(chats));
@@ -346,12 +404,13 @@
       renderChat();
     }
 
+    // 렌더링
     function renderToday() {
       const logs = JSON.parse(localStorage.getItem("todayLogs") || "[]");
       const currentUser = localStorage.getItem("userName");
       const box = document.getElementById("todayLogs");
       box.innerHTML = logs.map((l, i) => `
-        <div class="entry" data-index="${i}">
+        <div class="entry">
           ${l.text}
           <small>${l.user} | ${l.time}</small>
           ${l.user === currentUser ? `<button onclick="editToday(${i})">수정</button>` : ""}
@@ -364,7 +423,7 @@
       const currentUser = localStorage.getItem("userName");
       const box = document.getElementById("chatLogs");
       box.innerHTML = logs.map((l, i) => `
-        <div class="entry" data-index="${i}">
+        <div class="entry">
           ${l.text}
           <small>${l.user} | ${l.time}</small>
           ${l.user === currentUser ? `<button onclick="editChat(${i})">수정</button>` : ""}
@@ -396,19 +455,45 @@
       }
     }
 
-    // Enter로도 입력
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        if (document.activeElement.id === "todayInput") { addTodayLog(); e.preventDefault(); }
-        if (document.activeElement.id === "chatInput") { addChat(); e.preventDefault(); }
-      }
-    });
+    // 플레이리스트
+    function addSong() {
+      const input = document.getElementById("playlistInput");
+      const title = input.value.trim();
+      if (!title) return;
+      const songs = JSON.parse(localStorage.getItem("playlist") || "[]");
+      songs.push({ title });
+      localStorage.setItem("playlist", JSON.stringify(songs));
+      input.value = "";
+      renderPlaylist();
+    }
 
-    // 로드
+    function deleteSong(i) {
+      const songs = JSON.parse(localStorage.getItem("playlist") || "[]");
+      songs.splice(i, 1);
+      localStorage.setItem("playlist", JSON.stringify(songs));
+      renderPlaylist();
+    }
+
+    function renderPlaylist() {
+      const songs = JSON.parse(localStorage.getItem("playlist") || "[]");
+      const box = document.getElementById("playlist");
+      box.innerHTML = songs
+        .map((s, i) => `
+          <div class="songCard">
+            ${s.title}
+            <button class="deleteBtn" onclick="deleteSong(${i})">×</button>
+          </div>
+        `)
+        .join("");
+    }
+
+    // 불러오기
     function loadData() {
-      if (localStorage.getItem("photo")) document.getElementById("couplePhoto").src = localStorage.getItem("photo");
+      if (localStorage.getItem("photo"))
+        document.getElementById("couplePhoto").src = localStorage.getItem("photo");
       renderToday();
       renderChat();
+      renderPlaylist();
     }
 
     window.onload = () => {
