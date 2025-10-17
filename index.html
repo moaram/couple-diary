@@ -7,64 +7,67 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    :root{
+    :root {
       --accent: #3a4b63;
       --primary-soft: #e89cb8;
       --secondary-soft: #9cc7e8;
       --muted: #675b73;
     }
-    html,body{height:100%; margin:0;}
-    body{
-      background:linear-gradient(135deg,rgba(232,156,184,0.06),rgba(156,199,232,0.04));
-      font-family:"Noto Sans KR",system-ui;
-      color:#2b2b2b;
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+    }
+    body {
+      background: linear-gradient(135deg, rgba(232,156,184,0.06), rgba(156,199,232,0.04));
+      font-family: "Noto Sans KR", system-ui;
+      color: #2b2b2b;
+      transition: all 0.5s ease;
     }
 
-    /* 로그인 중앙 배치 */
-    #login-section{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
+    #login-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
-    /* 하트 애니메이션 */
     .heart-pop {
       animation: heartIn 0.8s ease-out forwards;
     }
     @keyframes heartIn {
-      0% { transform: scale(0); opacity:0; }
-      70% { transform: scale(1.2); opacity:1; }
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
       100% { transform: scale(1); }
     }
 
-    .container{max-width:1200px;margin:2rem auto;padding:0 1rem;display:flex;flex-direction:column;gap:1.5rem;}
-    header{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
-    .brand{display:flex;align-items:center;gap:0.6rem;}
-    .logo{
-      width:48px;height:48px;border-radius:10px;
-      background:linear-gradient(45deg,var(--primary-soft),var(--secondary-soft));
-      display:flex;align-items:center;justify-content:center;
-      color:white;font-size:1.25rem;
-      box-shadow:0 6px 18px rgba(58,75,99,0.08);
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; }
+    .logo {
+      width: 48px; height: 48px; border-radius: 10px;
+      background: linear-gradient(45deg, var(--primary-soft), var(--secondary-soft));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.25rem;
+      box-shadow: 0 6px 18px rgba(58,75,99,0.08);
     }
-    .brand h1{font-size:1.1rem;color:var(--muted);margin:0;font-weight:700;}
+    .brand h1 { font-size: 1.1rem; color: var(--muted); margin: 0; font-weight: 700; }
 
-    .layout-row{display:flex;gap:1rem;flex-wrap:wrap;}
-    .panel{background:#fff;border-radius:14px;padding:1rem;box-shadow:0 6px 20px rgba(58,75,99,0.04);border:1px solid rgba(58,75,99,0.04);}
-    .left,.right{flex:1 1 300px;min-width:260px;display:flex;flex-direction:column;gap:0.6rem;}
-    .center{flex:0 1 420px;display:flex;flex-direction:column;align-items:center;gap:0.6rem;}
+    .layout-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .panel { background: #fff; border-radius: 14px; padding: 1rem; box-shadow: 0 6px 20px rgba(58,75,99,0.04); border: 1px solid rgba(58,75,99,0.04); }
+    .left, .right { flex: 1 1 300px; min-width: 260px; display: flex; flex-direction: column; gap: 0.6rem; }
+    .center { flex: 0 1 420px; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
 
-    .photo-box img{width:100%;border-radius:8px;object-fit:cover;max-height:520px;}
+    .photo-box img { width: 100%; border-radius: 8px; object-fit: cover; max-height: 520px; }
     @media(max-width:640px){.center{order:2;width:100%}.left{order:1;width:100%}.right{order:3;width:100%}}
 
-    h2{font-size:0.95rem;margin:0;color:var(--muted);}
-    input,textarea{border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:0.6rem;font-size:0.9rem;}
-    textarea{min-height:84px;resize:vertical;}
-    button.primary{background:var(--accent);color:white;padding:0.55rem 0.8rem;border-radius:10px;font-weight:600;font-size:0.95rem;}
-    button.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:0.45rem 0.6rem;border-radius:8px;font-size:0.88rem;color:var(--muted);}
-    .item{background:#fafafa;border-radius:8px;padding:0.6rem;border:1px solid rgba(0,0,0,0.03);font-size:0.9rem;}
-    .meta{font-size:0.78rem;color:#7b7b7b;}
+    h2 { font-size: 0.95rem; margin: 0; color: var(--muted); }
+    input, textarea { border: 1px solid rgba(0,0,0,0.06); border-radius: 10px; padding: 0.6rem; font-size: 0.9rem; }
+    textarea { min-height: 84px; resize: vertical; }
+    button.primary { background: var(--accent); color: white; padding: 0.55rem 0.8rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; }
+    button.ghost { background: transparent; border: 1px solid rgba(0,0,0,0.06); padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.88rem; color: var(--muted); }
+    .item { background: #fafafa; border-radius: 8px; padding: 0.6rem; border: 1px solid rgba(0,0,0,0.03); font-size: 0.9rem; }
+    .meta { font-size: 0.78rem; color: #7b7b7b; }
   </style>
 </head>
 <body>
@@ -108,8 +111,9 @@
 
         <section class="panel center">
           <h2>📸 Couple Photo</h2>
-          <div class="photo-box mt-2">
-            <img src="/mnt/data/무제6772_20250906015737.png" alt="couple">
+          <div class="photo-box mt-2 flex flex-col items-center space-y-3">
+            <img id="couple-photo" src="https://placehold.co/400x400?text=Couple+Photo" alt="커플 사진" class="rounded-2xl shadow-md w-full max-w-sm object-cover" />
+            <input type="file" id="photo-upload" accept="image/*" class="hidden text-sm border border-gray-300 rounded-md px-2 py-1 cursor-pointer" />
           </div>
         </section>
 
@@ -138,6 +142,9 @@
       getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
       updateDoc, doc, getDoc
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey:"AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
@@ -151,6 +158,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const loginBtn = document.getElementById("login-btn");
     const loginInput = document.getElementById("login-id");
@@ -170,6 +178,9 @@
     const musicList = document.getElementById("music-list");
     const topDay = document.getElementById("top-day");
 
+    const photoInput = document.getElementById("photo-upload");
+    const photoImg = document.getElementById("couple-photo");
+
     let currentUser = null;
 
     function updateDay(){
@@ -187,7 +198,6 @@
       else if(id==="CY0710") currentUser={name:"최요원",heart:"💙"};
       else return alert("등록되지 않은 ID");
 
-      // 애니메이션
       heartLogo.textContent=currentUser.heart;
       heartLogo.classList.add("heart-pop");
 
@@ -199,6 +209,9 @@
         loadToday();
         loadChat();
         loadMusic();
+        loadPhoto();
+        enablePhotoUpload();
+        window.scrollTo({ top: 0 });
       },700);
     }
 
@@ -338,11 +351,21 @@
       });
     }
 
-    function extractYouTubeId(url){
-      const m=url.match(/(?:v=|\/)([0-9A-Za-z_-]{6,11})(?:[&?]|$)/);
-      return m?m[1]:null;
+    // --- Couple Photo ---
+    function enablePhotoUpload() {
+      if (currentUser?.name === "최요원") photoInput.classList.remove("hidden");
+      else photoInput.classList.add("hidden");
     }
-    function escapeHtml(t){return t?.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")||"";}
-  </script>
-</body>
-</html>
+
+    function loadPhoto() {
+      const qPhoto = query(collection(db,"photo"), orderBy("time","desc"));
+      onSnapshot(qPhoto, snap => {
+        if (!snap.empty) {
+          const latest = snap.docs[0].data();
+          if (latest.url) photoImg.src = latest.url;
+        }
+      });
+    }
+
+    photoInput.addEventListener("change", async (e) => {
+      if (!currentUser || currentUser.name !== "최요원") return;
