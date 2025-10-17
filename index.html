@@ -215,8 +215,8 @@
           item.className = "item";
           item.innerHTML = `
             <div>${d.text}</div>
-            <div class="meta">${d.updateBy} · ${formatDate(d.timestamp)}</div>
-            ${d.updateBy === currentUser.name ? `
+            <div class="meta">${updateBy} · ${formatDate(d.timestamp)}</div>
+            ${updateBy === currentUser.name ? `
               <div class="flex gap-2 mt-1">
                 <button class="small edit" data-id="${id}">수정</button>
                 <button class="small delete" data-id="${id}">삭제</button>
@@ -308,3 +308,4 @@
   </script>
 </body>
 </html>
+
