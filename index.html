@@ -7,18 +7,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --coral: #e8a6a0;
-      --navy: #2c3e50;
-      --bg-light: #fffaf9;
-      --text-muted: #6b6b6b;
+      --accent: #2c3e50;
+      --coral: #e9a7a7;
+      --muted: #6b6b6b;
     }
+
     body {
       font-family: "Noto Sans KR", sans-serif;
-      background: linear-gradient(135deg, rgba(232,156,168,0.08), rgba(44,62,80,0.05));
-      color: var(--navy);
+      background: #fff;
+      color: #2b2b2b;
       margin: 0;
       overflow-x: hidden;
+      transition: opacity 0.6s ease;
     }
+
     header {
       display: flex;
       justify-content: flex-end;
@@ -30,25 +32,54 @@
       top: 0;
       z-index: 50;
     }
+
+    #login-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, rgba(233,167,167,0.12), rgba(44,62,80,0.08));
+    }
+
+    .login-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .layout {
       display: grid;
-      grid-template-columns: 1fr 1.1fr 1fr;
+      grid-template-columns: 1fr 1.3fr 1fr;
       gap: 1rem;
-      max-width: 1300px;
+      max-width: 1350px;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 1.5rem;
     }
+
     @media (max-width: 900px) {
       .layout {
         grid-template-columns: 1fr;
       }
     }
+
     .panel {
       background: white;
       border-radius: 1rem;
       padding: 1rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      animation: fadeIn 0.8s ease;
     }
+
     .log-item {
       background: #fafafa;
       border: 1px solid rgba(0,0,0,0.05);
@@ -57,6 +88,7 @@
       margin-top: 0.5rem;
       position: relative;
     }
+
     .edit-btn, .delete-btn {
       font-size: 0.75rem;
       position: absolute;
@@ -66,38 +98,50 @@
       background: none;
       border: none;
     }
-    .edit-btn { right: 40px; }
+
+    .edit-btn { right: 38px; }
     .delete-btn { right: 10px; }
+
     .photo-box img {
       width: 100%;
       border-radius: 0.75rem;
       object-fit: cover;
       max-height: 520px;
     }
+
     #chat-list {
       flex: 1;
       overflow-y: auto;
       padding-right: 5px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
     }
+
     #chat-box {
       display: flex;
       flex-direction: column;
       height: 550px;
     }
+
+    #chat-controls {
+      margin-top: auto;
+    }
+
+    #playlist {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 0.75rem;
+    }
   </style>
 </head>
 <body>
-
   <!-- 로그인 -->
-  <section id="login-section" class="flex flex-col justify-center items-center h-screen bg-[rgba(232,156,168,0.1)]">
-    <div class="bg-white p-6 rounded-2xl shadow-lg text-center w-80">
-      <div class="text-4xl mb-2">🤍</div>
+  <section id="login-section">
+    <div class="login-card">
+      <div class="text-3xl mb-2">🤍</div>
       <h2 class="mb-3 font-semibold text-gray-700">Login</h2>
-      <input id="login-id" class="w-full border p-2 rounded mb-2" placeholder="ID (SM0710 / CY0710)" />
-      <button id="login-btn" class="w-full bg-[var(--navy)] text-white py-2 rounded">Login</button>
+      <input id="login-id" class="w-full border p-2 rounded mb-2" placeholder="ID 입력 (SM0710 / CY0710)" />
+      <button id="login-btn" class="w-full bg-[#2c3e50] text-white py-2 rounded">Login</button>
     </div>
   </section>
 
@@ -113,7 +157,7 @@
       <div class="panel">
         <h2 class="font-semibold text-gray-700">🖤 Today Log</h2>
         <textarea id="today-text" placeholder="오늘 하루를 기록하세요..." class="w-full border rounded p-2 mt-1"></textarea>
-        <button id="save-today" class="mt-2 bg-[var(--coral)] text-white px-3 py-1 rounded">저장</button>
+        <button id="save-today" class="mt-2 bg-[#e9a7a7] text-white px-3 py-1 rounded">저장</button>
         <div id="today-list" class="mt-3"></div>
       </div>
 
@@ -130,22 +174,23 @@
       <div class="panel" id="chat-box">
         <h2 class="font-semibold text-gray-700">💬 Chat</h2>
         <div id="chat-list" class="mt-2 flex-1 overflow-auto"></div>
-        <div>
+        <div id="chat-controls">
           <input id="chat-input" type="text" placeholder="메시지를 입력하세요" class="w-full border rounded p-2 mt-2" />
-          <button id="chat-send" class="mt-2 bg-[var(--coral)] text-white px-3 py-1 rounded w-full">보내기</button>
+          <button id="chat-send" class="mt-2 bg-[#e9a7a7] text-white px-3 py-1 rounded w-full">보내기</button>
         </div>
       </div>
+    </div>
 
-      <!-- Playlist -->
-      <div class="panel col-span-3">
-        <h2 class="font-semibold text-gray-700">🎵 Playlist</h2>
-        <input id="music-url" type="text" placeholder="유튜브 링크 입력" class="w-full border rounded p-2 mt-1" />
-        <button id="add-music" class="mt-2 bg-[var(--coral)] text-white px-3 py-1 rounded">추가</button>
-        <div id="playlist" class="mt-3"></div>
-      </div>
+    <!-- Playlist -->
+    <div class="panel max-w-4xl mx-auto mb-10">
+      <h2 class="font-semibold text-gray-700">🎵 Playlist</h2>
+      <input id="music-url" type="text" placeholder="YouTube URL 입력" class="w-full border rounded p-2 mt-1" />
+      <button id="add-music" class="mt-2 bg-[#2c3e50] text-white px-3 py-1 rounded">추가</button>
+      <div id="playlist" class="mt-3"></div>
     </div>
   </section>
 
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -158,6 +203,7 @@
       messagingSenderId: "162533479109",
       appId: "1:162533479109:web:a67f8d213bddafc66fd6ac"
     };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -191,7 +237,7 @@
       loginInput.value = "";
     });
 
-    // === Today Log ===
+    // === TODAY LOG ===
     const todayText = document.getElementById("today-text");
     const saveToday = document.getElementById("save-today");
     const todayList = document.getElementById("today-list");
@@ -222,19 +268,12 @@
             <strong>${data.updateBy}</strong><br>${data.text}
             <div class="timestamp text-xs text-gray-500 mt-1">${data.date || ""}</div>
           `;
-          if (currentUser && currentUser.name === data.updateBy) {
-            const del = document.createElement("button");
-            del.className = "delete-btn";
-            del.textContent = "삭제";
-            del.onclick = () => deleteDoc(doc(db, "todayLogs", docSnap.id));
-            div.appendChild(del);
-          }
           todayList.appendChild(div);
         });
       });
     }
 
-    // === Chat ===
+    // === CHAT ===
     const chatInput = document.getElementById("chat-input");
     const chatSend = document.getElementById("chat-send");
     const chatList = document.getElementById("chat-list");
@@ -275,7 +314,7 @@
       });
     }
 
-    // === Playlist ===
+    // === PLAYLIST ===
     const musicUrl = document.getElementById("music-url");
     const addMusic = document.getElementById("add-music");
     const playlist = document.getElementById("playlist");
@@ -285,7 +324,9 @@
       const url = musicUrl.value.trim();
       if (!url) return;
       await addDoc(collection(db, "playlist"), {
-        url, addedBy: currentUser.name, timestamp: serverTimestamp()
+        url,
+        addedBy: currentUser.name,
+        timestamp: serverTimestamp()
       });
       musicUrl.value = "";
     });
@@ -300,15 +341,8 @@
           div.className = "log-item";
           div.innerHTML = `
             <a href="${d.url}" target="_blank" class="text-blue-600 underline">${d.url}</a>
-            <div class="timestamp text-xs text-gray-500">${d.addedBy || ""}</div>
+            <div class="timestamp text-xs text-gray-500 mt-1">${d.addedBy}</div>
           `;
-          if (currentUser && currentUser.name === d.addedBy) {
-            const del = document.createElement("button");
-            del.className = "delete-btn";
-            del.textContent = "삭제";
-            del.onclick = () => deleteDoc(doc(db, "playlist", docSnap.id));
-            div.appendChild(del);
-          }
           playlist.appendChild(div);
         });
       });
