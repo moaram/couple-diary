@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Couple Diary — Flip Edition</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -12,104 +12,111 @@
 <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-storage-compat.js"></script>
 
 <style>
-  :root{
-    --accent:#f28b82;
-    --bg-soft:#fffaf7;
-    --muted:#5c4d4d;
-    --panel:#ffffff;
+  :root {
+    --accent: #f28b82;
+    --bg-soft: #ffffff;
+    --muted: #333;
+    --panel: #fff;
   }
-  body{
-    margin:0;
-    background:var(--bg-soft);
-    color:var(--muted);
-    font-family:"Noto Sans KR",sans-serif;
-    overflow:hidden;
+  body {
+    margin: 0;
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-family: "Noto Sans KR", sans-serif;
+    overflow: hidden;
   }
-  #login-section{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+  #login-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
-  .panel{
-    background:var(--panel);
-    border-radius:16px;
-    padding:1rem;
-    box-shadow:0 8px 20px rgba(0,0,0,0.05);
-    border:1px solid rgba(0,0,0,0.04);
+  .panel {
+    background: var(--panel);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    width: 90%;
+    max-width: 400px;
   }
-  button.primary{
-    background:var(--accent);
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    padding:0.5rem 1rem;
-    font-weight:600;
-    cursor:pointer;
+  button.primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
   }
   .flip-container {
     perspective: 2000px;
-    height:100vh;
-    overflow:hidden;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .page {
-    width:90%;
-    max-width:1100px;
-    height:90%;
-    position:absolute;
-    transform-origin:left center;
-    background:var(--panel);
-    border-radius:18px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.1);
-    padding:2rem;
-    backface-visibility:hidden;
-    transition:transform 1s ease, opacity 1s ease;
-    opacity:0;
+    width: 90%;
+    max-width: 1000px;
+    height: 85%;
+    position: absolute;
+    transform-origin: left center;
+    background: var(--panel);
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    backface-visibility: hidden;
+    transition: transform 0.8s ease, opacity 0.8s ease;
+    opacity: 0;
   }
   .page.active {
-    transform:rotateY(0deg);
-    opacity:1;
-    z-index:2;
+    transform: rotateY(0deg);
+    opacity: 1;
+    z-index: 2;
   }
   .page.prev {
-    transform:rotateY(-180deg);
-    opacity:0;
+    transform: rotateY(-180deg);
+    opacity: 0;
   }
   .page.next {
-    transform:rotateY(180deg);
-    opacity:0;
+    transform: rotateY(180deg);
+    opacity: 0;
   }
-  .nav-btn{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    background:var(--accent);
-    color:white;
-    padding:0.5rem 0.8rem;
-    border-radius:50%;
-    cursor:pointer;
-    box-shadow:0 3px 10px rgba(0,0,0,0.2);
-    user-select:none;
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent);
+    color: white;
+    padding: 0.5rem 0.8rem;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    user-select: none;
   }
-  #prevPage{left:1rem;}
-  #nextPage{right:1rem;}
+  #prevPage {
+    left: 1rem;
+  }
+  #nextPage {
+    right: 1rem;
+  }
 </style>
 </head>
 <body>
   <!-- 로그인 -->
   <section id="login-section">
-    <div class="panel text-center max-w-sm w-full">
+    <div class="panel text-center">
       <div id="heart" class="text-4xl mb-2">🤍</div>
       <h2 class="mb-2 font-semibold text-gray-700">Login</h2>
-      <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text" class="border rounded-lg p-2 w-full mb-3"/>
-      <button id="login-btn" class="primary w-full">Login</button>
+      <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text"
+        class="border rounded-lg p-2 w-full mb-3" />
+      <button id="login-btn" class="primary">Login</button>
     </div>
   </section>
 
-  <!-- 다이어리 -->
+  <!-- 대시보드 -->
   <div id="diary" class="hidden flip-container">
     <div class="page active" id="page1">
       <h2 class="text-xl font-semibold text-[var(--accent)] mb-2">🖤 Today Log</h2>
@@ -121,8 +128,9 @@
     <div class="page next" id="page2">
       <h2 class="text-xl font-semibold text-[var(--accent)] mb-3">📸 Couple Photo</h2>
       <div class="text-center">
-        <img id="photo-img" src="https://via.placeholder.com/400x300?text=우리의+사진" class="mx-auto rounded-xl max-h-72 object-cover"/>
-        <input type="file" id="photo-upload" accept="image/*" class="hidden"/>
+        <img id="photo-img" src="https://via.placeholder.com/400x300?text=우리의+사진"
+          class="mx-auto rounded-xl max-h-72 object-cover" />
+        <input type="file" id="photo-upload" accept="image/*" class="hidden" />
         <div id="upload-trigger" class="text-[var(--accent)] mt-2 cursor-pointer">사진 변경하기</div>
       </div>
     </div>
@@ -130,14 +138,14 @@
     <div class="page next" id="page3">
       <h2 class="text-xl font-semibold text-[var(--accent)] mb-2">💬 Chat Log</h2>
       <div id="chat-box" class="overflow-y-auto max-h-60 flex flex-col items-end gap-2"></div>
-      <input id="chat-input" type="text" placeholder="메시지를 입력하세요" class="w-full border rounded p-2 mt-2"/>
+      <input id="chat-input" type="text" placeholder="메시지를 입력하세요" class="w-full border rounded p-2 mt-2" />
       <button id="send-btn" class="primary mt-2">보내기</button>
     </div>
 
     <div class="page next" id="page4">
       <h2 class="text-xl font-semibold text-[var(--accent)] mb-3">🎵 Playlist</h2>
       <div class="flex gap-2">
-        <input id="music-link" placeholder="YouTube 링크 입력" class="flex-1 border rounded p-2"/>
+        <input id="music-link" placeholder="YouTube 링크 입력" class="flex-1 border rounded p-2" />
         <button id="music-add" class="primary">추가</button>
       </div>
       <div id="music-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3"></div>
@@ -148,49 +156,64 @@
   </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Firebase 초기화
   const firebaseConfig = {
-    apiKey:"AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
-    authDomain:"couple-diary-42d49.firebaseapp.com",
-    projectId:"couple-diary-42d49",
-    storageBucket:"couple-diary-42d49.firebasestorage.app",
-    messagingSenderId:"162533479109",
-    appId:"1:162533479109:web:a67f8d213bddafc66fd6ac"
+    apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
+    authDomain: "couple-diary-42d49.firebaseapp.com",
+    projectId: "couple-diary-42d49",
+    storageBucket: "couple-diary-42d49.firebasestorage.app",
+    messagingSenderId: "162533479109",
+    appId: "1:162533479109:web:a67f8d213bddafc66fd6ac"
   };
   firebase.initializeApp(firebaseConfig);
-  const db=firebase.firestore();
-  const storage=firebase.storage();
 
-  const loginBtn=document.getElementById("login-btn");
-  const loginInput=document.getElementById("login-id");
-  const loginSection=document.getElementById("login-section");
-  const diary=document.getElementById("diary");
-  const pages=document.querySelectorAll(".page");
-  const prevBtn=document.getElementById("prevPage");
-  const nextBtn=document.getElementById("nextPage");
+  // ✅ 요소들
+  const loginBtn = document.getElementById("login-btn");
+  const loginInput = document.getElementById("login-id");
+  const loginSection = document.getElementById("login-section");
+  const diary = document.getElementById("diary");
+  const pages = document.querySelectorAll(".page");
+  const prevBtn = document.getElementById("prevPage");
+  const nextBtn = document.getElementById("nextPage");
 
-  let current=0;
-  let user=null;
+  let current = 0;
+  let user = null;
 
-  function showPage(index){
-    pages.forEach((p,i)=>{
-      p.classList.remove("active","next","prev");
-      if(i===index)p.classList.add("active");
-      else if(i<index)p.classList.add("prev");
+  function showPage(index) {
+    pages.forEach((p, i) => {
+      p.classList.remove("active", "next", "prev");
+      if (i === index) p.classList.add("active");
+      else if (i < index) p.classList.add("prev");
       else p.classList.add("next");
     });
   }
-  prevBtn.onclick=()=>{if(current>0){current--;showPage(current);}};
-  nextBtn.onclick=()=>{if(current<pages.length-1){current++;showPage(current);}};
 
-  loginBtn.onclick=()=>{
-    const id=loginInput.value.trim();
-    if(id==="SM0710") user={name:"김솔음"};
-    else if(id==="CY0710") user={name:"최요원"};
-    else return alert("등록되지 않은 ID");
+  prevBtn.onclick = () => {
+    if (current > 0) {
+      current--;
+      showPage(current);
+    }
+  };
+  nextBtn.onclick = () => {
+    if (current < pages.length - 1) {
+      current++;
+      showPage(current);
+    }
+  };
+
+  // ✅ 로그인 버튼 클릭
+  loginBtn.onclick = () => {
+    const id = loginInput.value.trim();
+    if (id === "SM0710") user = { name: "김솔음" };
+    else if (id === "CY0710") user = { name: "최요원" };
+    else return alert("등록되지 않은 ID 입니다.");
+
     loginSection.classList.add("hidden");
     diary.classList.remove("hidden");
     showPage(0);
   };
+});
 </script>
 </body>
 </html>
