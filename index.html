@@ -3,47 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Couple Dashboard</title>
+  <title>Couple Space</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --accent: #1c2431;
-      --primary: #e63946;
+      --navy: #1e2a3a;
+      --red: #e63946;
+      --soft-gray: #f7f8fa;
       --muted: #2f2f2f;
-      --bg-soft: #f6f7f9;
     }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+    body {
       font-family: "Noto Sans KR", sans-serif;
-      background: var(--bg-soft);
+      background: var(--soft-gray);
       color: var(--muted);
-      overflow-x: hidden;
+      margin: 0;
     }
 
-    /* 로그인 화면 */
+    /* 로그인 */
     #login-section {
       position: fixed;
       inset: 0;
       background: white;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
       z-index: 100;
     }
 
     .heart {
       font-size: 60px;
-      color: var(--primary);
+      color: var(--red);
       animation: heartPop 1s ease infinite;
     }
 
     @keyframes heartPop {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
+      50% { transform: scale(1.25); }
     }
 
     #login-box {
@@ -55,13 +52,13 @@
       padding: 0.6rem 1rem;
       border: 1px solid #ccc;
       border-radius: 10px;
-      width: 200px;
+      width: 220px;
       text-align: center;
     }
 
     #login-btn {
       margin-top: 0.7rem;
-      background: var(--accent);
+      background: var(--navy);
       color: white;
       padding: 0.6rem 1.2rem;
       border-radius: 10px;
@@ -91,11 +88,11 @@
       min-width: 280px;
       border-radius: 14px;
       padding: 1rem;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     }
 
     h2 {
-      color: var(--accent);
+      color: var(--navy);
       font-weight: 700;
       font-size: 1rem;
       margin-bottom: 0.6rem;
@@ -110,7 +107,7 @@
     }
 
     button.primary {
-      background: var(--primary);
+      background: var(--red);
       color: white;
       border: none;
       border-radius: 10px;
@@ -126,6 +123,22 @@
       object-fit: cover;
       max-height: 400px;
       cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .photo-box img:hover {
+      transform: scale(1.02);
+    }
+
+    .upload-btn {
+      margin-top: 0.6rem;
+      background: var(--navy);
+      color: white;
+      padding: 0.45rem 0.8rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-block;
     }
 
     .item {
@@ -143,10 +156,44 @@
       text-align: right;
     }
 
-    .playlist iframe {
-      border-radius: 10px;
+    /* 🎵 플레이리스트 */
+    .playlist {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .music-card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .music-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .music-card iframe {
       width: 100%;
-      height: 200px;
+      height: 150px;
+      border: 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .music-card .info {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+      color: #555;
+      text-align: center;
+    }
+
+    .music-card .info span {
+      display: block;
+      color: #888;
+      font-size: 0.75rem;
     }
   </style>
 </head>
@@ -173,8 +220,9 @@
 
       <section class="panel photo-box">
         <h2>📸 Couple Photo</h2>
-        <img id="photo-img" src="" alt="커플 사진" title="더블클릭해서 업로드" />
+        <img id="photo-img" src="" alt="커플 사진" title="더블클릭 또는 업로드로 변경" />
         <input type="file" id="photo-upload" accept="image/*" hidden />
+        <div class="upload-btn" id="photo-btn">📤 업로드</div>
       </section>
 
       <section class="panel">
@@ -185,13 +233,13 @@
       </section>
     </div>
 
-    <section class="panel mt-4 playlist">
+    <section class="panel mt-4">
       <h2>🎵 Playlist</h2>
       <div class="flex gap-2 mt-2">
         <input id="music-link" type="text" placeholder="YouTube 링크 입력" />
         <button id="music-add" class="primary">추가</button>
       </div>
-      <div id="music-list" class="mt-2"></div>
+      <div id="music-list" class="playlist"></div>
     </section>
   </main>
 
@@ -208,8 +256,7 @@
       projectId: "couple-diary-42d49",
       storageBucket: "couple-diary-42d49.firebasestorage.app",
       messagingSenderId: "162533479109",
-      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
-      measurementId: "G-2N8R9H692D"
+      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -235,6 +282,7 @@
 
     const photoImg = document.getElementById("photo-img");
     const photoUpload = document.getElementById("photo-upload");
+    const photoBtn = document.getElementById("photo-btn");
 
     let currentUser = null;
 
@@ -254,7 +302,6 @@
       loadPhoto();
     });
 
-    // 날짜 포맷
     function formatDate(date){
       if(!date) return "";
       const y=date.getFullYear(),m=date.getMonth()+1,d=date.getDate(),h=date.getHours(),min=date.getMinutes();
@@ -263,7 +310,7 @@
 
     function escapeHtml(t){return t?.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")||"";}
 
-    // Today Log
+    // 📘 Today Log
     todaySave.addEventListener("click", async () => {
       const text = todayText.value.trim();
       if (!text) return;
@@ -290,7 +337,7 @@
       });
     }
 
-    // Chat Log
+    // 💬 Chat Log
     sendBtn.addEventListener("click", async () => {
       const msg = chatInput.value.trim();
       if (!msg) return;
@@ -317,7 +364,7 @@
       });
     }
 
-    // Playlist
+    // 🎵 Playlist
     musicAdd.addEventListener("click", async () => {
       const url = musicLink.value.trim();
       if (!url) return;
@@ -337,33 +384,41 @@
           const d = docSnap.data();
           const vid = d.url.match(/(?:v=|youtu\.be\/)([^&]+)/)?.[1];
           if (vid) {
-            musicList.innerHTML += `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=0&rel=0" allow="autoplay; encrypted-media"></iframe>`;
+            const time = formatDate(d.timestamp?.toDate());
+            musicList.innerHTML += `
+              <div class="music-card">
+                <iframe src="https://www.youtube.com/embed/${vid}?rel=0"></iframe>
+                <div class="info">${d.addedBy}<span>${time}</span></div>
+              </div>`;
           }
         });
       });
     }
 
-    // 📸 Couple Photo (더블클릭 업로드)
-    photoImg.addEventListener("dblclick", () => {
-      if (!currentUser) return alert("로그인 후 업로드 가능");
-      photoUpload.click();
-    });
-
-    photoUpload.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const fileRef = ref(storage, `couple-photo/${file.name}`);
-      await uploadBytes(fileRef, file);
-      const url = await getDownloadURL(fileRef);
-      await addDoc(collection(db, "photo"), { url, timestamp: serverTimestamp() });
-    });
-
+    // 📸 Couple Photo
     function loadPhoto() {
       const q = query(collection(db, "photo"), orderBy("timestamp", "desc"));
       onSnapshot(q, (snap) => {
         if (!snap.empty) photoImg.src = snap.docs[0].data().url;
       });
     }
+
+    photoImg.addEventListener("dblclick", () => {
+      if (!currentUser) return alert("로그인 후 업로드 가능");
+      photoUpload.click();
+    });
+
+    photoBtn.addEventListener("click", () => photoUpload.click());
+
+    photoUpload.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const fileRef = ref(storage, `couple-photo/${Date.now()}_${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      await addDoc(collection(db, "photo"), { url, timestamp: serverTimestamp() });
+      photoImg.src = url;
+    });
   </script>
 </body>
 </html>
