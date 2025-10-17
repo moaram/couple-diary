@@ -84,17 +84,89 @@
       </div>
     </header>
 
-    <!-- 로그인 -->
-    <section id="login-section">
-      <div class="panel w-full max-w-sm text-center">
-        <div class="flex justify-center mb-3">
-          <div class="logo" id="login-heart">🤍</div>
-        </div>
-        <h2 class="mb-2">Login</h2>
-        <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text" class="w-full mb-3"/>
-        <button id="login-btn" class="primary w-full">Login</button>
-      </div>
-    </section>
+   <!-- 로그인 섹션 -->
+<section id="login-section"
+  class="fixed inset-0 flex flex-col items-center justify-center bg-white transition-opacity duration-700 z-50">
+  <div class="text-center w-full max-w-sm px-6 relative z-10">
+    <div class="flex justify-center mb-3">
+      <div id="login-heart" class="text-6xl transition-transform duration-700 opacity-100">🤍</div>
+    </div>
+    <h2 class="text-2xl mb-4 font-semibold text-gray-700">Login</h2>
+    <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text"
+      class="border px-4 py-3 rounded-lg w-full text-center text-lg focus:outline-none focus:ring-2 focus:ring-gray-400 transition mb-3" />
+    <button id="login-btn"
+      class="bg-black text-white text-lg px-4 py-3 rounded-lg w-full hover:bg-gray-800 active:scale-95 transition">
+      Login
+    </button>
+  </div>
+</section>
+
+<!-- 대시보드 -->
+<main id="dashboard" class="hidden opacity-0 transition-opacity duration-700">
+  <!-- 기존 대시보드 내용 그대로 -->
+</main>
+
+<style>
+  html, body {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  @keyframes heartExpand {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(4); opacity: 1; }
+    100% { transform: scale(6); opacity: 0; }
+  }
+
+  .heart-animate {
+    animation: heartExpand 1.2s ease-in-out forwards;
+  }
+
+  .fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .fade-in {
+    opacity: 1 !important;
+  }
+</style>
+
+<script type="module">
+  const loginBtn = document.getElementById("login-btn");
+  const loginInput = document.getElementById("login-id");
+  const loginSection = document.getElementById("login-section");
+  const dashboard = document.getElementById("dashboard");
+  const heartLogo = document.getElementById("login-heart");
+
+  let currentUser = null;
+
+  loginBtn.addEventListener("click", handleLogin);
+  loginInput.addEventListener("keypress", (e) => e.key === "Enter" && handleLogin());
+
+  function handleLogin() {
+    const id = loginInput.value.trim();
+    if (id === "SM0710") currentUser = { name: "김솔음", heart: "🖤" };
+    else if (id === "CY0710") currentUser = { name: "최요원", heart: "💙" };
+    else return alert("등록되지 않은 ID입니다.");
+
+    // 하트 색상 전환 및 커지는 애니메이션
+    heartLogo.textContent = currentUser.heart;
+    heartLogo.classList.add("heart-animate");
+
+    // 화면 전환
+    setTimeout(() => {
+      loginSection.classList.add("fade-out");
+      setTimeout(() => {
+        loginSection.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+        dashboard.classList.add("fade-in");
+        document.body.style.overflow = "auto";
+      }, 900);
+    }, 1000);
+  }
+</script>
+
 
     <!-- 대시보드 -->
     <main id="dashboard" class="hidden">
@@ -346,3 +418,4 @@
   </script>
 </body>
 </html>
+
