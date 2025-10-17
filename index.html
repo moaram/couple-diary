@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Couple Space</title>
+  <title>Couple Diary</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --accent: #344054;
-      --primary-soft: #f2b6bb;
-      --secondary-soft: #b3c7e6;
+      --accent: #2e3a59;
+      --soft-coral: #f3b3ae;
+      --soft-navy: #b3c7e6;
+      --soft-bg: #fffdfd;
     }
     body {
       font-family: "Noto Sans KR", sans-serif;
-      background: linear-gradient(135deg, rgba(242,182,187,0.15), rgba(179,199,230,0.1));
+      background-color: var(--soft-bg);
       overflow: hidden;
     }
 
-    /* 페이드 인/아웃 */
     .fade {
       transition: opacity 0.7s ease;
     }
@@ -31,7 +31,6 @@
       visibility: visible;
     }
 
-    /* 하트 애니메이션 */
     .heart-pop {
       animation: popIn 0.7s ease forwards;
     }
@@ -107,7 +106,7 @@
           <h2>🖤 Today Log</h2>
           <textarea id="today-text" placeholder="오늘 하루를 기록하세요..."></textarea>
           <button id="today-save" class="primary mt-1">저장</button>
-          <div id="today-list" class="mt-2 space-y-2"></div>
+          <div id="today-list" class="mt-2 space-y-2 text-sm"></div>
         </section>
 
         <section class="panel center">
@@ -119,7 +118,7 @@
 
         <section class="panel right">
           <h2>💬 Chat Log</h2>
-          <div id="chat-box" class="mt-2 max-h-[300px] overflow-auto flex flex-col gap-2"></div>
+          <div id="chat-box" class="mt-2 max-h-[300px] overflow-auto flex flex-col gap-2 text-sm"></div>
           <input id="chat-input" placeholder="메시지를 입력하세요" />
           <button id="send-btn" class="primary mt-1">보내기</button>
         </section>
@@ -138,14 +137,23 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { 
+      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    import { 
+      getStorage, ref, uploadBytes, getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const app = initializeApp({
       apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
       authDomain: "couple-diary-42d49.firebaseapp.com",
       projectId: "couple-diary-42d49",
+      storageBucket: "couple-diary-42d49.firebasestorage.app"
     });
+
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const loginSection = document.getElementById("login-section");
     const dashboard = document.getElementById("dashboard");
@@ -154,9 +162,21 @@
     const heartLogo = document.getElementById("login-heart");
     const userDisplay = document.getElementById("user-display");
     const logoutBtn = document.getElementById("logout-btn");
+    const todayInput = document.getElementById("today-text");
+    const todaySave = document.getElementById("today-save");
+    const todayList = document.getElementById("today-list");
+    const chatInput = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const chatBox = document.getElementById("chat-box");
+    const musicInput = document.getElementById("music-link");
+    const musicAdd = document.getElementById("music-add");
+    const musicList = document.getElementById("music-list");
+    const couplePhoto = document.getElementById("couple-photo");
+    const photoUpload = document.getElementById("photo-upload");
 
     let currentUser = null;
 
+    // 로그인 처리
     loginBtn.addEventListener("click", handleLogin);
     loginInput.addEventListener("keypress", e => e.key === "Enter" && handleLogin());
 
@@ -167,11 +187,11 @@
       else return alert("등록되지 않은 ID입니다.");
 
       heartLogo.classList.add("heart-pop");
-
       setTimeout(() => {
         fadeSwitch(loginSection, dashboard);
         userDisplay.textContent = `${currentUser.name} ${currentUser.heart}`;
         logoutBtn.classList.remove("hidden");
+        loadData();
       }, 600);
     }
 
@@ -191,6 +211,79 @@
         toEl.classList.remove("hidden-section");
         toEl.classList.add("visible-section");
       }, 700);
+    }
+
+    // --- Today Log 저장 ---
+    todaySave.addEventListener("click", async () => {
+      if (!todayInput.value.trim()) return;
+      await addDoc(collection(db, "todayLog"), {
+        text: todayInput.value,
+        user: currentUser.name,
+        time: serverTimestamp()
+      });
+      todayInput.value = "";
+    });
+
+    // --- Chat 저장 ---
+    sendBtn.addEventListener("click", async () => {
+      if (!chatInput.value.trim()) return;
+      await addDoc(collection(db, "chatLog"), {
+        text: chatInput.value,
+        user: currentUser.name,
+        time: serverTimestamp()
+      });
+      chatInput.value = "";
+    });
+
+    // --- Music 추가 ---
+    musicAdd.addEventListener("click", async () => {
+      const link = musicInput.value.trim();
+      if (!link) return;
+      await addDoc(collection(db, "musicList"), { link, time: serverTimestamp() });
+      musicInput.value = "";
+    });
+
+    // --- 이미지 업로드 ---
+    couplePhoto.addEventListener("dblclick", () => photoUpload.click());
+    photoUpload.addEventListener("change", async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const storageRef = ref(storage, "couplePhoto/photo.jpg");
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      couplePhoto.src = url;
+    });
+
+    // --- 실시간 데이터 ---
+    function loadData() {
+      onSnapshot(query(collection(db, "todayLog"), orderBy("time", "asc")), snap => {
+        todayList.innerHTML = "";
+        snap.forEach(doc => {
+          const d = doc.data();
+          const date = d.time?.toDate().toLocaleString("ko-KR", { year:'2-digit', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+          todayList.innerHTML += `<div class="p-2 bg-gray-50 rounded-lg"><b>${d.user}</b> (${date})<br>${d.text}</div>`;
+        });
+      });
+
+      onSnapshot(query(collection(db, "chatLog"), orderBy("time", "asc")), snap => {
+        chatBox.innerHTML = "";
+        snap.forEach(doc => {
+          const d = doc.data();
+          const date = d.time?.toDate().toLocaleString("ko-KR", { hour:'2-digit', minute:'2-digit' });
+          const align = d.user === "김솔음" ? "text-right" : "text-left";
+          chatBox.innerHTML += `<div class="${align}"><b>${d.user}</b> <span class="text-xs text-gray-400">${date}</span><br>${d.text}</div>`;
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+
+      onSnapshot(query(collection(db, "musicList"), orderBy("time", "desc")), snap => {
+        musicList.innerHTML = "";
+        snap.forEach(doc => {
+          const d = doc.data();
+          const embed = d.link.replace("watch?v=", "embed/");
+          musicList.innerHTML += `<iframe src="${embed}" allow="autoplay"></iframe>`;
+        });
+      });
     }
   </script>
 </body>
