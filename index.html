@@ -5,158 +5,172 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Couple Space</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     :root {
-      --accent: #3a4b63;
-      --primary-soft: #f3b1a5;
-      --secondary-soft: #e5a3c1;
-      --muted: #5b4a52;
+      --accent: #344054;
+      --primary-soft: #f2b6bb;
+      --secondary-soft: #b3c7e6;
+      --muted: #6e6e6e;
     }
-
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
-      overflow: hidden;
       font-family: "Noto Sans KR", sans-serif;
-      background: linear-gradient(135deg, rgba(255,245,245,1), rgba(250,240,240,0.8));
-      color: #2b2b2b;
+      background: linear-gradient(135deg, rgba(242,182,187,0.15), rgba(179,199,230,0.1));
+      color: #333;
+      overflow: hidden;
     }
 
-    .fade-in {
-      animation: fadeIn 1s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
+    /* 로그인 화면 중앙 배치 */
     #login-section {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      transition: opacity 0.7s ease;
     }
 
-    .heart {
-      font-size: 2.5rem;
-      transition: transform 0.5s ease;
-    }
+    /* 하트 애니메이션 */
     .heart-pop {
-      transform: scale(1.3);
+      animation: popIn 0.7s ease forwards;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
     }
 
-    .panel {
-      background: white;
-      border-radius: 14px;
-      padding: 1rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      border: 1px solid rgba(0, 0, 0, 0.04);
+    /* 페이드 인 */
+    .fade-in {
+      animation: fadeIn 1s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .panel { background: #fff; border-radius: 14px; padding: 1rem; box-shadow: 0 4px 16px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); }
+    .layout-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .left, .right, .center { flex: 1 1 300px; display: flex; flex-direction: column; gap: 0.8rem; }
+
+    /* 사진 */
+    .photo-box img {
+      width: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+      cursor: pointer;
+      max-height: 480px;
+      transition: transform 0.3s;
+    }
+    .photo-box img:hover { transform: scale(1.01); }
+
+    /* 플레이리스트 */
+    #music-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    iframe {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    h2 { font-size: 1rem; color: var(--accent); font-weight: 600; margin: 0; }
     input, textarea {
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0,0,0,0.08);
       border-radius: 10px;
       padding: 0.6rem;
       font-size: 0.9rem;
-      width: 100%;
     }
-
     button.primary {
       background: var(--accent);
       color: white;
-      padding: 0.6rem 1rem;
+      border: none;
       border-radius: 10px;
+      padding: 0.55rem 0.8rem;
       font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-
+    button.primary:hover { background: #222; }
     .item {
       background: #fafafa;
       border-radius: 8px;
       padding: 0.6rem;
-      margin-top: 0.4rem;
-      border: 1px solid rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0,0,0,0.04);
+      font-size: 0.9rem;
     }
-
     .meta {
-      font-size: 0.75rem;
-      color: #777;
-    }
-
-    .photo-box img {
-      width: 100%;
-      max-height: 420px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-
-    .playlist-card iframe {
-      border-radius: 10px;
+      font-size: 0.78rem;
+      color: #7b7b7b;
+      margin-top: 2px;
     }
   </style>
 </head>
+
 <body>
-  <div id="login-section" class="fade-in">
-    <div class="panel w-full max-w-sm text-center">
-      <div class="flex justify-center mb-3">
-        <div class="heart" id="heart-logo">🤍</div>
-      </div>
-      <h2 class="text-lg font-semibold mb-2">Login</h2>
-      <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text" />
-      <button id="login-btn" class="primary mt-3 w-full">Login</button>
-    </div>
-  </div>
+  <div class="container">
+    <header>
+      <div id="user-display" class="text-gray-600 text-sm"></div>
+      <button id="logout-btn" class="hidden primary">Logout</button>
+    </header>
 
-  <main id="dashboard" class="hidden fade-in">
-    <div class="flex justify-between items-center px-6 py-3">
-      <div id="user-display" class="text-sm text-gray-600"></div>
-      <button id="logout-btn" class="primary text-sm py-1 px-3">Logout</button>
-    </div>
-
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-      <section class="panel">
-        <h2 class="text-gray-700 font-semibold mb-2">🖤 Today Log</h2>
-        <textarea id="today-text" placeholder="오늘 하루를 기록하세요..."></textarea>
-        <button id="today-save" class="primary mt-2">저장</button>
-        <div id="today-list"></div>
-      </section>
-
-      <section class="panel text-center">
-        <h2 class="text-gray-700 font-semibold mb-2">📸 Couple Photo</h2>
-        <div class="photo-box mb-2">
-          <img id="couple-photo" src="" alt="Couple Photo" />
+    <!-- 로그인 -->
+    <section id="login-section">
+      <div class="panel w-full max-w-sm text-center">
+        <div class="flex justify-center mb-3">
+          <div id="login-heart" class="text-4xl">🤍</div>
         </div>
-        <input type="file" id="photo-upload" accept="image/*" class="mt-1" />
-      </section>
-
-      <section class="panel">
-        <h2 class="text-gray-700 font-semibold mb-2">💬 Chat Log</h2>
-        <div id="chat-box" class="max-h-[300px] overflow-auto flex flex-col gap-2"></div>
-        <input id="chat-input" type="text" placeholder="메시지를 입력하세요" />
-        <button id="send-btn" class="primary mt-2">보내기</button>
-      </section>
-    </div>
-
-    <section class="panel m-4">
-      <h2 class="text-gray-700 font-semibold mb-2">🎵 Playlist</h2>
-      <div class="flex gap-2">
-        <input id="music-link" placeholder="YouTube 링크 입력" type="text" />
-        <button id="music-add" class="primary">추가</button>
+        <h2 class="mb-2">Login</h2>
+        <input id="login-id" placeholder="ID 입력 (SM0710 / CY0710)" type="text" class="w-full mb-3" />
+        <button id="login-btn" class="primary w-full">Login</button>
       </div>
-      <div id="music-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3"></div>
     </section>
-  </main>
+
+    <!-- 대시보드 -->
+    <main id="dashboard" class="hidden fade-in">
+      <div class="layout-row">
+        <section class="panel left">
+          <h2>🖤 Today Log</h2>
+          <textarea id="today-text" placeholder="오늘 하루를 기록하세요..."></textarea>
+          <button id="today-save" class="primary mt-1">저장</button>
+          <div id="today-list" class="mt-2 space-y-2"></div>
+        </section>
+
+        <section class="panel center">
+          <h2>📸 Couple Photo</h2>
+          <div class="photo-box mt-2">
+            <img id="couple-photo" src="https://via.placeholder.com/400x400.png?text=Couple+Photo" alt="couple" />
+          </div>
+          <input type="file" id="photo-upload" accept="image/*" class="hidden" />
+        </section>
+
+        <section class="panel right">
+          <h2>💬 Chat Log</h2>
+          <div id="chat-box" class="mt-2 max-h-[300px] overflow-auto flex flex-col gap-2"></div>
+          <input id="chat-input" type="text" placeholder="메시지를 입력하세요" />
+          <button id="send-btn" class="primary mt-1">보내기</button>
+        </section>
+      </div>
+
+      <section class="panel mt-4">
+        <h2>🎵 Playlist</h2>
+        <div class="flex gap-2 mt-2">
+          <input id="music-link" placeholder="YouTube 링크 입력" type="text" class="flex-1" />
+          <button id="music-add" class="primary">추가</button>
+        </div>
+        <div id="music-list" class="mt-3"></div>
+      </section>
+    </main>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import {
       getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
-      updateDoc, doc, getDoc, setDoc
+      updateDoc, doc, getDoc
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
@@ -165,31 +179,30 @@
       storageBucket: "couple-diary-42d49.firebasestorage.app",
       messagingSenderId: "162533479109",
       appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
-      measurementId: "G-2N8R9H692D"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     const loginBtn = document.getElementById("login-btn");
     const loginInput = document.getElementById("login-id");
     const loginSection = document.getElementById("login-section");
     const dashboard = document.getElementById("dashboard");
-    const heartLogo = document.getElementById("heart-logo");
+    const heartLogo = document.getElementById("login-heart");
     const logoutBtn = document.getElementById("logout-btn");
     const userDisplay = document.getElementById("user-display");
-    const todayText = document.getElementById("today-text");
-    const todaySave = document.getElementById("today-save");
+
     const todayList = document.getElementById("today-list");
     const chatBox = document.getElementById("chat-box");
+    const todayText = document.getElementById("today-text");
+    const todaySave = document.getElementById("today-save");
     const chatInput = document.getElementById("chat-input");
     const sendBtn = document.getElementById("send-btn");
-    const musicInput = document.getElementById("music-link");
     const musicAdd = document.getElementById("music-add");
+    const musicInput = document.getElementById("music-link");
     const musicList = document.getElementById("music-list");
-    const photoUpload = document.getElementById("photo-upload");
     const couplePhoto = document.getElementById("couple-photo");
+    const photoUpload = document.getElementById("photo-upload");
 
     let currentUser = null;
 
@@ -204,34 +217,46 @@
 
       heartLogo.classList.add("heart-pop");
       setTimeout(() => {
-        loginSection.classList.add("hidden");
-        dashboard.classList.remove("hidden");
-        userDisplay.textContent = `${currentUser.name} ${currentUser.heart}`;
-        loadAllData();
-      }, 600);
+        loginSection.classList.add("opacity-0", "transition-opacity", "duration-700");
+        setTimeout(() => {
+          loginSection.classList.add("hidden");
+          dashboard.classList.remove("hidden");
+          dashboard.classList.add("fade-in");
+          userDisplay.textContent = `${currentUser.name} ${currentUser.heart}`;
+          logoutBtn.classList.remove("hidden");
+          loadAllData();
+          window.scrollTo(0, 0);
+          document.body.style.overflow = "hidden";
+        }, 700);
+      }, 500);
     }
 
     logoutBtn.addEventListener("click", () => {
       currentUser = null;
       dashboard.classList.add("hidden");
       loginSection.classList.remove("hidden");
-      loginInput.value = "";
+      loginSection.classList.remove("opacity-0");
+      logoutBtn.classList.add("hidden");
+      userDisplay.textContent = "";
+      heartLogo.textContent = "🤍";
     });
 
-    async function loadAllData() {
-      loadToday();
-      loadChat();
-      loadMusic();
-      loadPhoto();
+    function formatTime(ts) {
+      const d = ts?.toDate ? ts.toDate() : new Date();
+      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${d.getHours()}시 ${String(d.getMinutes()).padStart(2,'0')}분`;
     }
 
-    // 📒 투데이 로그
+    // --- Firestore Loaders ---
+    function loadAllData() { loadToday(); loadChat(); loadMusic(); }
+
     todaySave.addEventListener("click", async () => {
       if (!currentUser) return;
       const text = todayText.value.trim();
       if (!text) return;
       await addDoc(collection(db, "todayLogs"), {
-        text, user: currentUser.name, time: new Date().toLocaleString(), timestamp: serverTimestamp()
+        text,
+        updatedBy: currentUser.name,
+        timestamp: serverTimestamp(),
       });
       todayText.value = "";
     });
@@ -240,51 +265,66 @@
       const q = query(collection(db, "todayLogs"), orderBy("timestamp", "desc"));
       onSnapshot(q, snap => {
         todayList.innerHTML = "";
-        snap.forEach(d => {
-          const data = d.data();
-          const div = document.createElement("div");
-          div.className = "item fade-in";
-          div.innerHTML = `<div>${data.text}</div><div class="meta">${data.user} • ${data.time}</div>`;
-          todayList.appendChild(div);
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const el = document.createElement("div");
+          el.className = "item";
+          el.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <div>${escapeHtml(d.text)}</div>
+                <div class="meta">by ${d.updatedBy} • ${formatTime(d.timestamp)}</div>
+              </div>
+              ${d.updatedBy === currentUser?.name ? `<button class="ghost edit-today" data-id="${docSnap.id}">수정</button>` : ""}
+            </div>`;
+          todayList.appendChild(el);
         });
       });
     }
 
-    // 💬 채팅
     sendBtn.addEventListener("click", sendChat);
-    chatInput.addEventListener("keypress", e => e.key === "Enter" && sendChat());
+    chatInput.addEventListener("keypress", e => { if (e.key === "Enter") sendChat(); });
 
     async function sendChat() {
       if (!currentUser) return;
       const msg = chatInput.value.trim();
       if (!msg) return;
-      await addDoc(collection(db, "chatLogs"), {
-        user: currentUser.name, heart: currentUser.heart,
-        message: msg, time: new Date().toLocaleString(), timestamp: serverTimestamp()
+      await addDoc(collection(db, "chat"), {
+        name: currentUser.name,
+        heart: currentUser.heart,
+        message: msg,
+        timestamp: serverTimestamp(),
       });
       chatInput.value = "";
     }
 
     function loadChat() {
-      const q = query(collection(db, "chatLogs"), orderBy("timestamp", "desc"));
+      const q = query(collection(db, "chat"), orderBy("timestamp", "desc"));
       onSnapshot(q, snap => {
         chatBox.innerHTML = "";
-        snap.forEach(d => {
-          const data = d.data();
-          const div = document.createElement("div");
-          div.className = "item fade-in text-right";
-          div.innerHTML = `<div><strong>${data.user} ${data.heart}</strong></div><div>${data.message}</div><div class="meta">${data.time}</div>`;
-          chatBox.appendChild(div);
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const el = document.createElement("div");
+          el.className = "item text-right";
+          el.innerHTML = `
+            <div>
+              <div><strong>${d.name}</strong> ${d.heart}</div>
+              <div>${escapeHtml(d.message)}</div>
+              <div class="meta">${formatTime(d.timestamp)}</div>
+            </div>`;
+          chatBox.appendChild(el);
         });
       });
     }
 
-    // 🎵 플레이리스트
     musicAdd.addEventListener("click", async () => {
+      if (!currentUser) return;
       const url = musicInput.value.trim();
       if (!url) return;
       await addDoc(collection(db, "playlist"), {
-        url, addedBy: currentUser.name, timestamp: serverTimestamp()
+        url,
+        addedBy: currentUser.name,
+        timestamp: serverTimestamp(),
       });
       musicInput.value = "";
     });
@@ -293,38 +333,39 @@
       const q = query(collection(db, "playlist"), orderBy("timestamp", "desc"));
       onSnapshot(q, snap => {
         musicList.innerHTML = "";
-        snap.forEach(d => {
-          const data = d.data();
-          const vid = extractYouTubeId(data.url);
-          const card = document.createElement("div");
-          card.className = "playlist-card item fade-in";
-          card.innerHTML = `
-            <iframe src="https://www.youtube.com/embed/${vid}" allow="encrypted-media" class="w-full h-40 border-0"></iframe>
-            <div class="meta">by ${data.addedBy}</div>`;
-          musicList.appendChild(card);
+        snap.forEach(docSnap => {
+          const d = docSnap.data();
+          const vid = extractYouTubeId(d.url);
+          if (!vid) return;
+          const el = document.createElement("div");
+          el.className = "bg-white rounded-xl border border-gray-100 shadow-sm p-2";
+          el.innerHTML = `
+            <iframe src="https://www.youtube.com/embed/${vid}?rel=0" allow="autoplay; encrypted-media" class="h-40 border-0"></iframe>
+            <div class="text-sm mt-1">${escapeHtml(d.addedBy)}</div>`;
+          musicList.appendChild(el);
         });
       });
     }
 
+    // 사진 업로드
+    couplePhoto.addEventListener("dblclick", () => photoUpload.click());
+    photoUpload.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        couplePhoto.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
     function extractYouTubeId(url) {
-      const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{6,11})/);
+      const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{6,11})(?:[&?]|$)/);
       return m ? m[1] : null;
     }
 
-    // 📸 사진 업로드
-    photoUpload.addEventListener("change", async e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const storageRef = ref(storage, "couple-photo/latest.jpg");
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      await setDoc(doc(db, "photo", "current"), { url });
-    });
-
-    function loadPhoto() {
-      onSnapshot(doc(db, "photo", "current"), d => {
-        if (d.exists()) couplePhoto.src = d.data().url;
-      });
+    function escapeHtml(t) {
+      return t?.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;") || "";
     }
   </script>
 </body>
