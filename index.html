@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Couple Diary — Flip Edition</title>
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- ✅ Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-storage-compat.js"></script>
+
 <style>
   :root{
     --accent:#f28b82;
@@ -141,13 +147,7 @@
     <div id="nextPage" class="nav-btn">〉</div>
   </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, orderBy, query, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } 
-    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
-
+<script>
   const firebaseConfig = {
     apiKey:"AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
     authDomain:"couple-diary-42d49.firebaseapp.com",
@@ -156,22 +156,21 @@
     messagingSenderId:"162533479109",
     appId:"1:162533479109:web:a67f8d213bddafc66fd6ac"
   };
-  const app=initializeApp(firebaseConfig);
-  const db=getFirestore(app);
-  const storage=getStorage(app);
+  firebase.initializeApp(firebaseConfig);
+  const db=firebase.firestore();
+  const storage=firebase.storage();
 
   const loginBtn=document.getElementById("login-btn");
   const loginInput=document.getElementById("login-id");
   const loginSection=document.getElementById("login-section");
   const diary=document.getElementById("diary");
-  const heart=document.getElementById("heart");
   const pages=document.querySelectorAll(".page");
   const prevBtn=document.getElementById("prevPage");
   const nextBtn=document.getElementById("nextPage");
+
   let current=0;
   let user=null;
 
-  // 페이지 전환
   function showPage(index){
     pages.forEach((p,i)=>{
       p.classList.remove("active","next","prev");
@@ -183,94 +182,15 @@
   prevBtn.onclick=()=>{if(current>0){current--;showPage(current);}};
   nextBtn.onclick=()=>{if(current<pages.length-1){current++;showPage(current);}};
 
-  // 로그인
-  loginBtn.addEventListener("click",()=>{
+  loginBtn.onclick=()=>{
     const id=loginInput.value.trim();
     if(id==="SM0710") user={name:"김솔음"};
     else if(id==="CY0710") user={name:"최요원"};
     else return alert("등록되지 않은 ID");
-    heart.textContent="🤍";
     loginSection.classList.add("hidden");
     diary.classList.remove("hidden");
-    loadData();
-  });
-
-  // Firebase 연동 (간략히)
-  const todayText=document.getElementById("today-text");
-  const todaySave=document.getElementById("today-save");
-  const todayList=document.getElementById("today-list");
-  const chatInput=document.getElementById("chat-input");
-  const sendBtn=document.getElementById("send-btn");
-  const chatBox=document.getElementById("chat-box");
-  const musicAdd=document.getElementById("music-add");
-  const musicInput=document.getElementById("music-link");
-  const musicList=document.getElementById("music-list");
-  const photoUpload=document.getElementById("photo-upload");
-  const photoImg=document.getElementById("photo-img");
-  const uploadTrigger=document.getElementById("upload-trigger");
-
-  todaySave.onclick=async()=>{
-    if(!user)return;
-    await addDoc(collection(db,"todayLogs"),{text:todayText.value,by:user.name,timestamp:serverTimestamp()});
-    todayText.value="";
-  };
-  onSnapshot(query(collection(db,"todayLogs"),orderBy("timestamp","desc")),snap=>{
-    todayList.innerHTML="";
-    snap.forEach(d=>{
-      const data=d.data();
-      const div=document.createElement("div");
-      div.className="p-2 bg-[#fff5f2] rounded-lg text-sm";
-      div.innerHTML=`${data.text}<div class='text-xs text-gray-400 mt-1'>${data.by}</div>`;
-      todayList.appendChild(div);
-    });
-  });
-  sendBtn.onclick=async()=>{
-    if(!user)return;
-    await addDoc(collection(db,"chat"),{msg:chatInput.value,by:user.name,timestamp:serverTimestamp()});
-    chatInput.value="";
-  };
-  onSnapshot(query(collection(db,"chat"),orderBy("timestamp","desc")),snap=>{
-    chatBox.innerHTML="";
-    snap.forEach(d=>{
-      const data=d.data();
-      const div=document.createElement("div");
-      div.className="bg-[#fff5f2] rounded-lg p-2 text-right text-sm";
-      div.innerHTML=`${data.msg}<div class='text-xs text-gray-400 mt-1'>${data.by}</div>`;
-      chatBox.append(div);
-    });
-  });
-  musicAdd.onclick=async()=>{
-    if(!user)return;
-    await addDoc(collection(db,"playlist"),{url:musicInput.value,by:user.name,timestamp:serverTimestamp()});
-    musicInput.value="";
-  };
-  onSnapshot(query(collection(db,"playlist"),orderBy("timestamp","desc")),snap=>{
-    musicList.innerHTML="";
-    snap.forEach(d=>{
-      const data=d.data();
-      const id=data.url.match(/v=([A-Za-z0-9_-]+)/);
-      if(id){
-        const div=document.createElement("div");
-        div.innerHTML=`
-        <iframe class='w-full h-32 rounded-lg' src='https://www.youtube.com/embed/${id[1]}'></iframe>
-        <div class='text-xs text-center text-gray-500'>${data.by}</div>`;
-        musicList.append(div);
-      }
-    });
-  });
-  uploadTrigger.onclick=()=>photoUpload.click();
-  photoUpload.onchange=async(e)=>{
-    const file=e.target.files[0];
-    if(!file)return;
-    const storageRef=ref(storage,`photos/${file.name}`);
-    await uploadBytes(storageRef,file);
-    const url=await getDownloadURL(storageRef);
-    photoImg.src=url;
-  };
-
-  function loadData(){
     showPage(0);
-  }
+  };
 </script>
 </body>
 </html>
