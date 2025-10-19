@@ -3,65 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Couple Space</title>
+  <title>Couple Space ✿</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background: linear-gradient(145deg, #e3e8ee, #f4f6f8);
-      font-family: "Noto Sans KR", sans-serif;
-      color: #2e3b4e;
+      background: linear-gradient(145deg, #fff9f8, #fefefe);
+      font-family: "Pretendard", "Noto Sans KR", sans-serif;
+      color: #5b4a4a;
+      overflow-x: hidden;
     }
+
+    /* Soft UI Base */
     .panel {
-      background: #f9fbfd;
-      border-radius: 20px;
-      padding: 1rem;
-      box-shadow: 6px 6px 12px #cfd5dc, -6px -6px 12px #ffffff;
+      background: #fffdfa;
+      border-radius: 25px;
+      padding: 1.2rem;
+      box-shadow: 5px 5px 10px rgba(0,0,0,0.05), -3px -3px 8px #ffffff;
     }
+
     .btn {
-      background: #8ea6be;
+      background: linear-gradient(135deg, #f7c6b7, #f9a5a2);
       color: white;
-      border-radius: 10px;
-      padding: 0.5rem 1rem;
+      font-weight: 600;
+      border-radius: 999px;
+      padding: 0.5rem 1.2rem;
       font-size: 0.9rem;
-      transition: 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 2px 2px 6px rgba(247, 175, 160, 0.4);
     }
-    .btn:hover { opacity: 0.9; }
+
+    .btn:hover { transform: scale(1.05); opacity: 0.95; }
+
     input, textarea {
       border: none;
       outline: none;
-      background: #f1f4f8;
-      border-radius: 10px;
-      padding: 0.6rem;
+      background: #fff3f1;
+      border-radius: 15px;
+      padding: 0.7rem 0.9rem;
       width: 100%;
-      box-shadow: inset 3px 3px 6px #d3dae1, inset -3px -3px 6px #ffffff;
+      font-size: 0.9rem;
+      box-shadow: inset 2px 2px 4px #e7d6d2, inset -2px -2px 4px #fff;
     }
+
     .chat-bubble {
-      background: #e7edf5;
+      background: #ffe5e2;
+      color: #5b4a4a;
       padding: 0.6rem 0.8rem;
-      border-radius: 12px;
+      border-radius: 15px;
       max-width: 75%;
       word-wrap: break-word;
-      box-shadow: 3px 3px 6px #ccd3db, -3px -3px 6px #ffffff;
+      font-size: 0.9rem;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.05), -2px -2px 6px #fff;
     }
+
+    .chat-bubble.me {
+      background: #ffd2cf;
+      align-self: flex-end;
+    }
+
+    /* Login */
     #login-page {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: linear-gradient(135deg, #e7ecf1, #f8fafc);
+      background: linear-gradient(145deg, #fff0ef, #ffe5e3);
+      transition: opacity 0.5s ease;
     }
-    #dashboard { display: none; }
+
+    #dashboard {
+      display: none;
+      opacity: 0;
+      transform: rotateY(90deg);
+      transform-origin: left;
+      transition: all 0.8s ease;
+    }
+
+    #dashboard.active {
+      display: block;
+      opacity: 1;
+      transform: rotateY(0);
+    }
+
     button.small {
-      background: #d6dde4;
-      color: #465566;
-      border-radius: 6px;
-      padding: 0.2rem 0.5rem;
+      background: #f9c2b9;
+      color: white;
+      border-radius: 10px;
+      padding: 0.25rem 0.6rem;
       font-size: 0.75rem;
       transition: 0.2s;
     }
-    button.small:hover { background: #bfc9d4; }
+
+    button.small:hover { background: #f7a9a3; }
+
+    .meta {
+      font-size: 0.7rem;
+      color: #a38888;
+      margin-top: 2px;
+    }
+
     @media (max-width: 768px) {
       .flex-col-mobile { flex-direction: column; }
+      .chat-bubble { font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -70,41 +113,41 @@
   <!-- 로그인 -->
   <div id="login-page">
     <div class="panel max-w-sm w-full text-center">
-      <h1 class="text-2xl font-semibold mb-4 text-gray-700">💙 Couple Space</h1>
-      <input id="login-id" placeholder="ID를 입력하세요 (SM0710 / CY0710)" class="mb-4"/>
-      <button id="login-btn" class="btn w-full">로그인</button>
+      <h1 class="text-2xl font-bold mb-4 text-[#e38884]">🍑 Couple Space</h1>
+      <input id="login-id" placeholder="ID를 입력하세요 (SM0710 / CY0710)" class="mb-4 text-center"/>
+      <button id="login-btn" class="btn w-full">Login</button>
     </div>
   </div>
 
   <!-- 대시보드 -->
-  <div id="dashboard" class="container mx-auto p-4 max-w-7xl">
+  <div id="dashboard" class="container mx-auto p-4 max-w-6xl">
     <div class="flex justify-end mb-4 items-center gap-3">
-      <div id="user-display" class="text-gray-700 font-semibold"></div>
-      <button id="logout-btn" class="text-sm text-gray-500">Logout</button>
+      <div id="user-display" class="font-semibold text-[#6b5555]"></div>
+      <button id="logout-btn" class="text-sm text-[#a47b7b] hover:text-[#d88b8b]">Logout</button>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-4 flex-col-mobile">
       <!-- 투데이로그 -->
       <section class="panel flex-1">
-        <h2 class="font-semibold text-gray-600 mb-2">🖤 Today Log</h2>
-        <textarea id="today-input" placeholder="오늘 하루를 기록하세요..."></textarea>
-        <button id="today-save" class="btn mt-2 w-full">저장</button>
+        <h2 class="font-semibold text-[#e68a83] mb-2">📖 Today Log</h2>
+        <textarea id="today-input" placeholder="오늘 하루를 기록해볼까?"></textarea>
+        <button id="today-save" class="btn mt-2 w-full">저장하기</button>
         <div id="today-list" class="mt-3 space-y-3"></div>
       </section>
 
       <!-- 사진 -->
       <section class="panel flex-1">
-        <h2 class="font-semibold text-gray-600 mb-2">📸 Couple Photo</h2>
-        <img id="photo-display" class="rounded-lg w-full max-h-[480px] object-contain bg-white" alt="photo"/>
-        <input type="file" id="photo-upload" accept="image/*" class="mt-2 text-sm text-gray-500"/>
+        <h2 class="font-semibold text-[#e68a83] mb-2">📸 Couple Photo</h2>
+        <img id="photo-display" class="rounded-lg w-full max-h-[480px] object-cover bg-[#fff7f6]" alt="photo"/>
+        <input type="file" id="photo-upload" accept="image/*" class="mt-2 text-sm text-[#a47b7b]"/>
       </section>
 
       <!-- 채팅 -->
       <section class="panel flex-1">
-        <h2 class="font-semibold text-gray-600 mb-2">💬 Chat Log</h2>
+        <h2 class="font-semibold text-[#e68a83] mb-2">💬 Chat Log</h2>
         <div id="chat-box" class="overflow-y-auto h-[420px] flex flex-col gap-2 mt-2 p-1"></div>
         <div class="mt-2 flex gap-2">
-          <input id="chat-input" placeholder="메시지를 입력하세요" />
+          <input id="chat-input" placeholder="메시지를 입력해요 💌" />
           <button id="chat-send" class="btn">보내기</button>
         </div>
       </section>
@@ -112,9 +155,9 @@
 
     <!-- 플레이리스트 -->
     <section class="panel mt-4">
-      <h2 class="font-semibold text-gray-600 mb-2">🎵 Playlist</h2>
+      <h2 class="font-semibold text-[#e68a83] mb-2">🎵 Playlist</h2>
       <div class="flex gap-2">
-        <input id="music-link" placeholder="YouTube 링크 입력" />
+        <input id="music-link" placeholder="유튜브 링크 입력 🎧" />
         <button id="music-add" class="btn">추가</button>
       </div>
       <div id="music-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3"></div>
@@ -145,6 +188,7 @@
     const storage = getStorage(app);
 
     let currentUser = null;
+
     const loginPage = document.getElementById("login-page");
     const dashboard = document.getElementById("dashboard");
     const loginBtn = document.getElementById("login-btn");
@@ -169,10 +213,13 @@
       else if (id === "CY0710") currentUser = { name: "최요원", heart: "💙" };
       else return alert("아이디가 잘못되었습니다.");
 
-      loginPage.style.display = "none";
-      dashboard.style.display = "block";
-      userDisplay.textContent = `${currentUser.heart} ${currentUser.name}`;
-      loadData();
+      loginPage.style.opacity = 0;
+      setTimeout(() => {
+        loginPage.style.display = "none";
+        dashboard.classList.add("active");
+        userDisplay.textContent = `${currentUser.heart} ${currentUser.name}`;
+        loadData();
+      }, 400);
     });
 
     logoutBtn.addEventListener("click", () => { alert("로그아웃 되었습니다."); location.reload(); });
@@ -184,18 +231,19 @@
     };
 
     const loadData = () => {
-      // --- 투데이로그 ---
+      // 투데이로그
       const todayQ = query(collection(db, "todayLogs"), orderBy("timestamp", "desc"));
       onSnapshot(todayQ, (snap) => {
         todayList.innerHTML = "";
         snap.forEach((docSnap) => {
           const d = docSnap.data();
+          const userName = d.updateBy || "익명";
           const div = document.createElement("div");
-          div.className = "item";
+          div.className = "panel";
           div.innerHTML = `
             <div class="flex justify-between items-center">
-              <div><b>${d.updateBy}</b> — ${d.text}</div>
-              ${d.updateBy === currentUser.name ? `<div>
+              <div><b>${userName}</b> — ${d.text}</div>
+              ${userName === currentUser.name ? `<div>
                 <button class="small edit-btn" data-id="${docSnap.id}">수정</button>
                 <button class="small delete-btn" data-id="${docSnap.id}">삭제</button>
               </div>` : ""}
@@ -203,6 +251,8 @@
             <div class="meta">${formatDate(d.timestamp)}</div>`;
           todayList.appendChild(div);
         });
+
+        // 수정 / 삭제 이벤트
         todayList.querySelectorAll(".delete-btn").forEach((b) =>
           b.addEventListener("click", async (e) => {
             if (confirm("정말 삭제할까요?")) await deleteDoc(doc(db, "todayLogs", e.target.dataset.id));
@@ -216,7 +266,7 @@
         );
       });
 
-      // --- 채팅 ---
+      // 채팅
       const chatQ = query(collection(db, "chat"), orderBy("timestamp", "asc"));
       onSnapshot(chatQ, (snap) => {
         chatBox.innerHTML = "";
@@ -224,13 +274,13 @@
           const d = docSnap.data();
           const msg = document.createElement("div");
           msg.className = "flex " + (d.name === currentUser.name ? "justify-end" : "justify-start");
-          msg.innerHTML = `<div class="chat-bubble">${d.message}<div class="meta">${d.name} | ${formatDate(d.timestamp)}</div></div>`;
+          msg.innerHTML = `<div class="chat-bubble ${d.name === currentUser.name ? "me" : ""}">${d.message}<div class="meta">${d.name} | ${formatDate(d.timestamp)}</div></div>`;
           chatBox.appendChild(msg);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
       });
 
-      // --- 플레이리스트 ---
+      // 플레이리스트
       const playQ = query(collection(db, "playlist"), orderBy("timestamp", "desc"));
       onSnapshot(playQ, (snap) => {
         musicList.innerHTML = "";
@@ -238,10 +288,10 @@
           const d = docSnap.data();
           const url = d.url.replace("watch?v=", "embed/");
           const div = document.createElement("div");
-          div.className = "item";
+          div.className = "panel text-center";
           div.innerHTML = `
-            <iframe width="100%" height="180" src="${url}" allowfullscreen></iframe>
-            <div class="meta">${d.addedBy} | ${formatDate(d.timestamp)}</div>
+            <iframe width="100%" height="160" src="${url}" class="rounded-lg" allowfullscreen></iframe>
+            <div class="meta mt-1">${d.addedBy} | ${formatDate(d.timestamp)}</div>
             ${d.addedBy === currentUser.name ? `
               <div class="flex justify-end gap-2 mt-1">
                 <button class="small edit-btn" data-id="${docSnap.id}">수정</button>
@@ -263,7 +313,7 @@
         );
       });
 
-      // --- 사진 ---
+      // 사진
       const photoQ = query(collection(db, "photo"), orderBy("timestamp", "desc"));
       onSnapshot(photoQ, (snap) => {
         const first = snap.docs[0]?.data();
@@ -271,7 +321,6 @@
       });
     };
 
-    // 입력 이벤트
     todaySave.addEventListener("click", async () => {
       const text = todayInput.value.trim();
       if (!text) return;
@@ -300,7 +349,6 @@
       musicLink.value = "";
     });
 
-    // 사진 업로드
     photoUpload.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
