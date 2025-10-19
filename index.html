@@ -12,15 +12,12 @@
       color: #5b4a4a;
       overflow-x: hidden;
     }
-
-    /* Soft UI Base */
     .panel {
       background: #fffdfa;
       border-radius: 25px;
       padding: 1.2rem;
       box-shadow: 5px 5px 10px rgba(0,0,0,0.05), -3px -3px 8px #ffffff;
     }
-
     .btn {
       background: linear-gradient(135deg, #f7c6b7, #f9a5a2);
       color: white;
@@ -30,10 +27,9 @@
       font-size: 0.9rem;
       transition: all 0.2s ease;
       box-shadow: 2px 2px 6px rgba(247, 175, 160, 0.4);
+      white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
     }
-
     .btn:hover { transform: scale(1.05); opacity: 0.95; }
-
     input, textarea {
       border: none;
       outline: none;
@@ -44,7 +40,6 @@
       font-size: 0.9rem;
       box-shadow: inset 2px 2px 4px #e7d6d2, inset -2px -2px 4px #fff;
     }
-
     .chat-bubble {
       background: #ffe5e2;
       color: #5b4a4a;
@@ -55,36 +50,7 @@
       font-size: 0.9rem;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.05), -2px -2px 6px #fff;
     }
-
-    .chat-bubble.me {
-      background: #ffd2cf;
-      align-self: flex-end;
-    }
-
-    /* Login */
-    #login-page {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(145deg, #fff0ef, #ffe5e3);
-      transition: opacity 0.5s ease;
-    }
-
-    #dashboard {
-      display: none;
-      opacity: 0;
-      transform: rotateY(90deg);
-      transform-origin: left;
-      transition: all 0.8s ease;
-    }
-
-    #dashboard.active {
-      display: block;
-      opacity: 1;
-      transform: rotateY(0);
-    }
-
+    .chat-bubble.me { background: #ffd2cf; align-self: flex-end; }
     button.small {
       background: #f9c2b9;
       color: white;
@@ -92,26 +58,17 @@
       padding: 0.25rem 0.6rem;
       font-size: 0.75rem;
       transition: 0.2s;
+      white-space: nowrap;
     }
-
     button.small:hover { background: #f7a9a3; }
-
-    .meta {
-      font-size: 0.7rem;
-      color: #a38888;
-      margin-top: 2px;
-    }
-
-    @media (max-width: 768px) {
-      .flex-col-mobile { flex-direction: column; }
-      .chat-bubble { font-size: 0.85rem; }
-    }
+    .meta { font-size: 0.7rem; color: #a38888; margin-top: 2px; }
+    .flex-nowrap { flex-wrap: nowrap; align-items: center; }
   </style>
 </head>
 <body>
 
   <!-- 로그인 -->
-  <div id="login-page">
+  <div id="login-page" class="flex justify-center items-center h-screen bg-gradient-to-br from-[#fff0ef] to-[#ffe5e3]">
     <div class="panel max-w-sm w-full text-center">
       <h1 class="text-2xl font-bold mb-4 text-[#e38884]">🍑 Couple Space</h1>
       <input id="login-id" placeholder="ID를 입력하세요 (SM0710 / CY0710)" class="mb-4 text-center"/>
@@ -120,13 +77,13 @@
   </div>
 
   <!-- 대시보드 -->
-  <div id="dashboard" class="container mx-auto p-4 max-w-6xl">
+  <div id="dashboard" class="hidden container mx-auto p-4 max-w-6xl">
     <div class="flex justify-end mb-4 items-center gap-3">
       <div id="user-display" class="font-semibold text-[#6b5555]"></div>
       <button id="logout-btn" class="text-sm text-[#a47b7b] hover:text-[#d88b8b]">Logout</button>
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-4 flex-col-mobile">
+    <div class="flex flex-col lg:flex-row gap-4">
       <!-- 투데이로그 -->
       <section class="panel flex-1">
         <h2 class="font-semibold text-[#e68a83] mb-2">📖 Today Log</h2>
@@ -135,33 +92,26 @@
         <div id="today-list" class="mt-3 space-y-3"></div>
       </section>
 
-      <!-- 사진 -->
-      <section class="panel flex-1">
-        <h2 class="font-semibold text-[#e68a83] mb-2">📸 Couple Photo</h2>
-        <img id="photo-display" class="rounded-lg w-full max-h-[480px] object-cover bg-[#fff7f6]" alt="photo"/>
-        <input type="file" id="photo-upload" accept="image/*" class="mt-2 text-sm text-[#a47b7b]"/>
-      </section>
-
       <!-- 채팅 -->
       <section class="panel flex-1">
         <h2 class="font-semibold text-[#e68a83] mb-2">💬 Chat Log</h2>
         <div id="chat-box" class="overflow-y-auto h-[420px] flex flex-col gap-2 mt-2 p-1"></div>
-        <div class="mt-2 flex gap-2">
+        <div class="mt-2 flex flex-nowrap gap-2">
           <input id="chat-input" placeholder="메시지를 입력해요 💌" />
           <button id="chat-send" class="btn">보내기</button>
         </div>
       </section>
-    </div>
 
-    <!-- 플레이리스트 -->
-    <section class="panel mt-4">
-      <h2 class="font-semibold text-[#e68a83] mb-2">🎵 Playlist</h2>
-      <div class="flex gap-2">
-        <input id="music-link" placeholder="유튜브 링크 입력 🎧" />
-        <button id="music-add" class="btn">추가</button>
-      </div>
-      <div id="music-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-3"></div>
-    </section>
+      <!-- 플레이리스트 -->
+      <section class="panel flex-1">
+        <h2 class="font-semibold text-[#e68a83] mb-2">🎵 Playlist</h2>
+        <div class="flex flex-nowrap gap-2">
+          <input id="music-link" placeholder="유튜브 링크 입력 🎧" />
+          <button id="music-add" class="btn">추가</button>
+        </div>
+        <div id="music-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3"></div>
+      </section>
+    </div>
   </div>
 
   <!-- Firebase -->
@@ -171,7 +121,6 @@
       getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
       updateDoc, deleteDoc, doc
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBw9CXG7BMyCQ3qMWFaXPfi_gS_HIiXIOA",
@@ -179,16 +128,12 @@
       projectId: "couple-diary-42d49",
       storageBucket: "couple-diary-42d49.firebasestorage.app",
       messagingSenderId: "162533479109",
-      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac",
-      measurementId: "G-2N8R9H692D"
+      appId: "1:162533479109:web:a67f8d213bddafc66fd6ac"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     let currentUser = null;
-
     const loginPage = document.getElementById("login-page");
     const dashboard = document.getElementById("dashboard");
     const loginBtn = document.getElementById("login-btn");
@@ -204,8 +149,6 @@
     const musicLink = document.getElementById("music-link");
     const musicAdd = document.getElementById("music-add");
     const musicList = document.getElementById("music-list");
-    const photoUpload = document.getElementById("photo-upload");
-    const photoDisplay = document.getElementById("photo-display");
 
     loginBtn.addEventListener("click", () => {
       const id = loginId.value.trim();
@@ -213,13 +156,10 @@
       else if (id === "CY0710") currentUser = { name: "최요원", heart: "💙" };
       else return alert("아이디가 잘못되었습니다.");
 
-      loginPage.style.opacity = 0;
-      setTimeout(() => {
-        loginPage.style.display = "none";
-        dashboard.classList.add("active");
-        userDisplay.textContent = `${currentUser.heart} ${currentUser.name}`;
-        loadData();
-      }, 400);
+      loginPage.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      userDisplay.textContent = `${currentUser.heart} ${currentUser.name}`;
+      loadData();
     });
 
     logoutBtn.addEventListener("click", () => { alert("로그아웃 되었습니다."); location.reload(); });
@@ -227,7 +167,7 @@
     const formatDate = (ts) => {
       if (!ts) return "";
       const d = ts.toDate();
-      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+      return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;
     };
 
     const loadData = () => {
@@ -237,22 +177,21 @@
         todayList.innerHTML = "";
         snap.forEach((docSnap) => {
           const d = docSnap.data();
-          const userName = d.updateBy || "익명";
           const div = document.createElement("div");
           div.className = "panel";
           div.innerHTML = `
             <div class="flex justify-between items-center">
-              <div><b>${userName}</b> — ${d.text}</div>
-              ${userName === currentUser.name ? `<div>
-                <button class="small edit-btn" data-id="${docSnap.id}">수정</button>
-                <button class="small delete-btn" data-id="${docSnap.id}">삭제</button>
-              </div>` : ""}
+              <div><b>${d.updateBy || "익명"}</b> — ${d.text}</div>
+              ${d.updateBy === currentUser.name ? `
+                <div>
+                  <button class="small edit-btn" data-id="${docSnap.id}">수정</button>
+                  <button class="small delete-btn" data-id="${docSnap.id}">삭제</button>
+                </div>` : ""}
             </div>
             <div class="meta">${formatDate(d.timestamp)}</div>`;
           todayList.appendChild(div);
         });
 
-        // 수정 / 삭제 이벤트
         todayList.querySelectorAll(".delete-btn").forEach((b) =>
           b.addEventListener("click", async (e) => {
             if (confirm("정말 삭제할까요?")) await deleteDoc(doc(db, "todayLogs", e.target.dataset.id));
@@ -264,20 +203,6 @@
             if (newText) await updateDoc(doc(db, "todayLogs", e.target.dataset.id), { text: newText, updateBy: currentUser.name });
           })
         );
-      });
-
-      // 채팅
-      const chatQ = query(collection(db, "chat"), orderBy("timestamp", "asc"));
-      onSnapshot(chatQ, (snap) => {
-        chatBox.innerHTML = "";
-        snap.forEach((docSnap) => {
-          const d = docSnap.data();
-          const msg = document.createElement("div");
-          msg.className = "flex " + (d.name === currentUser.name ? "justify-end" : "justify-start");
-          msg.innerHTML = `<div class="chat-bubble ${d.name === currentUser.name ? "me" : ""}">${d.message}<div class="meta">${d.name} | ${formatDate(d.timestamp)}</div></div>`;
-          chatBox.appendChild(msg);
-        });
-        chatBox.scrollTop = chatBox.scrollHeight;
       });
 
       // 플레이리스트
@@ -300,6 +225,7 @@
           `;
           musicList.appendChild(div);
         });
+
         musicList.querySelectorAll(".delete-btn").forEach((b) =>
           b.addEventListener("click", async (e) => {
             if (confirm("정말 삭제할까요?")) await deleteDoc(doc(db, "playlist", e.target.dataset.id));
@@ -311,13 +237,6 @@
             if (newUrl) await updateDoc(doc(db, "playlist", e.target.dataset.id), { url: newUrl, addedBy: currentUser.name });
           })
         );
-      });
-
-      // 사진
-      const photoQ = query(collection(db, "photo"), orderBy("timestamp", "desc"));
-      onSnapshot(photoQ, (snap) => {
-        const first = snap.docs[0]?.data();
-        if (first) photoDisplay.src = first.url;
       });
     };
 
@@ -334,11 +253,10 @@
       const msg = chatInput.value.trim();
       if (!msg) return;
       await addDoc(collection(db, "chat"), {
-        message: msg, name: currentUser.name, heart: currentUser.heart, timestamp: serverTimestamp()
+        message: msg, name: currentUser.name, timestamp: serverTimestamp()
       });
       chatInput.value = "";
     });
-    chatInput.addEventListener("keypress", e => e.key === "Enter" && chatSend.click());
 
     musicAdd.addEventListener("click", async () => {
       const url = musicLink.value.trim();
@@ -347,16 +265,6 @@
         url, addedBy: currentUser.name, timestamp: serverTimestamp()
       });
       musicLink.value = "";
-    });
-
-    photoUpload.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const refPath = ref(storage, `photos/${Date.now()}_${file.name}`);
-      await uploadBytes(refPath, file);
-      const url = await getDownloadURL(refPath);
-      await addDoc(collection(db, "photo"), { url, name: currentUser.name, timestamp: serverTimestamp() });
-      photoDisplay.src = url;
     });
   </script>
 </body>
